@@ -2,6 +2,7 @@
 import type { CopyMode } from "./CopyMode";
 import type { Join } from "./Join";
 import type { StepKind } from "./StepKind";
+import type { JsonValue } from "./serde_json/JsonValue";
 
 /**
  * A node that is not an agent. Which fields apply depends on `kind`.
@@ -34,4 +35,4 @@ copies?: CopyMode,
 /**
  * `fan-in`: wait for all items, or continue on the first.
  */
-join?: Join, };
+join?: Join, extensions?: { [key in string]: JsonValue }, };

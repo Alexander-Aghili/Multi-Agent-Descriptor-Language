@@ -1,5 +1,5 @@
 //! Steps, topology patterns and loops.
-use super::CopyMode;
+use super::{CopyMode, Extensions};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
@@ -45,6 +45,9 @@ pub struct Step {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub join: Option<Join>,
+    #[serde(default, skip_serializing_if = "Extensions::is_empty")]
+    #[ts(as = "Option<Extensions>", optional)]
+    pub extensions: Extensions,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, JsonSchema, TS)]
