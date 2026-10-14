@@ -49,7 +49,7 @@ arbitrary code (runtime-specific callables live in extensions).
 | 1 | MADL is the vendor-neutral successor of `sculptured.team/v1`; Sculptured gets a converter, then reads and writes MADL natively |
 | 2 | v0.1 scope: the system descriptor only |
 | 3 | Authored as YAML or JSON; JSON is canonical; no custom syntax |
-| 4 | Source of truth: `schema/<revision>/schema.ts` → generated `schema.json` (JSON Schema 2020-12) → generated types for Python and Rust |
+| 4 | Source of truth: the Rust crate's types → generated `schema/<revision>/schema.json` (JSON Schema 2020-12, via `schemars`) and TypeScript types (via `ts-rs`), as Sculptured does today. The published `schema.json` is the language-neutral definition other languages generate from |
 | 5 | Flat document (compose-style), not `apiVersion/kind/metadata/spec` |
 | 6 | Dated spec revisions (`2026-11-01`); `draft` while unreleased |
 | 7 | Settings split into **preferences** (override) and **restrictions** (only tighten) |
@@ -62,8 +62,8 @@ arbitrary code (runtime-specific callables live in extensions).
 | 14 | Apache-2.0 for code, CC-BY-4.0 for spec text |
 | 15 | Hosted under the author's GitHub account; moved to an org before public announcement |
 | 16 | Name: Multi-Agent Descriptor Language (MADL) |
-| 17 | Reference implementations in TypeScript (CLI and package), Rust (crate) and Python (package) |
-| 18 | **Open:** one Rust core with Python/TS bindings, or three native implementations (§12) |
+| 17 | Rust only for now: the `madl` crate and the `madl` CLI. Python and TypeScript packages and the CAMEL adapter come later, generated from `schema.json` |
+| 18 | When Python and TypeScript packages come, they call the Rust core (PyO3, wasm) rather than reimplement it, so semantics cannot drift |
 
 ## 3. Document
 
@@ -466,29 +466,22 @@ runs the same fixtures in CI.
 ## 12. Implementations
 
 ```
-schema/<revision>/schema.ts      source of truth
-schema/<revision>/schema.json    generated, checked in CI (no drift)
-packages/typescript   @madl/spec: types, validate, resolve, expand; `madl` CLI
-crates/madl           madl: serde types (generated), validate, resolve, expand
-python/madl           madl: pydantic v2 models (generated from schema.json), validate, resolve, expand
-adapters/camel        madl-camel: build a CAMEL Workforce from MADL; export one back
+crates/madl/          the types (serde), validate, resolve, expand, graph, convert
+crates/madl-cli/      the `madl` binary
+schema/<revision>/schema.json    generated from the crate's types; a test fails if it is stale
+                                 (regenerate with UPDATE_SCHEMAS=1)
+bindings/typescript/  generated TypeScript types (ts-rs), used by Sculptured's web board
 ```
 
 CLI: `madl validate`, `madl resolve`, `madl expand`, `madl graph` (Mermaid and SVG),
-`madl convert --from sculptured-team-v1|open-agent-spec|crewai --to madl`,
+`madl convert --from sculptured-team-v1 --to madl` (Open Agent Spec and CrewAI later),
 `madl export a2a-cards`.
 
-**Open decision 18:**
+Sculptured depends on the `madl` crate (a git dependency until it is published to crates.io).
 
-| | One Rust core, bindings (PyO3 wheels for Python, wasm for TS) | Three native implementations |
-|---|---|---|
-| Semantics | One implementation; cannot drift | Three; held together by fixtures |
-| Install | Python: binary wheels per platform; TS: wasm in the package | Pure Python, pure TS |
-| Sculptured | Uses the crate directly | Uses the Rust one |
-| Work | One resolver + binding glue | Three resolvers |
-
-Recommendation: one Rust core with bindings; types still generated natively for each language,
-so authors get native editor help in all three.
+Later, not in v0.1: a Python package (pydantic models generated from `schema.json`, calling the
+Rust core through PyO3 wheels), a TypeScript package (types from `ts-rs`, the core through
+wasm), and the CAMEL adapter in Python.
 
 ## 13. Interop mappings
 
@@ -566,7 +559,7 @@ schema/draft/          schema.ts, schema.json
 examples/              pipeline, supervisor, debate, role-play, coding team, CAD review,
                        textbook team, human approval, open swarm with bans
 conformance/           valid/ invalid/ resolve/
-packages/typescript/   crates/madl/   python/madl/   adapters/camel/
+crates/madl/   crates/madl-cli/   bindings/typescript/
 docs/                  site sources; design/ (this document)
 meps/                  MADL Enhancement Proposals: 0001-core.md is this design once accepted
 .github/workflows/     schema generation check, example validation, conformance per language,
@@ -575,20 +568,18 @@ meps/                  MADL Enhancement Proposals: 0001-core.md is this design o
 
 ## 16. Testing
 
-- The schema is generated in CI and diffed against the checked-in `schema.json`.
+- A test regenerates `schema.json` and the TypeScript types and fails if the checked-in copies differ.
 - Every file in `examples/` validates; every file in `conformance/invalid/` fails with its
   expected code and path.
-- `conformance/resolve/` fixtures run against every implementation.
+- `conformance/resolve/` fixtures run against the crate (and every later implementation).
 - Round trip: Sculptured's team fixtures convert to MADL and back without loss (extensions
   included).
-- The CAMEL adapter builds Workforce objects from examples and checks their structure. No model
-  is called in any test.
+- No model is called in any test.
 
 ## 17. Milestones
 
-1. Spec text, `schema.ts` and `schema.json`, examples, conformance fixtures.
-2. Core implementation (per decision 18): validate, resolve, expand, graph; CLI.
-3. Python and TypeScript packages.
-4. Sculptured: team/v1 ↔ MADL converter, then native MADL.
-5. CAMEL adapter.
-6. Docs site, then the first dated revision.
+1. Spec text, the crate's types, generated `schema.json`, examples, conformance fixtures.
+2. Validate, resolve, expand, graph; the `madl` CLI.
+3. Sculptured: team/v1 ↔ MADL converter, then Sculptured reads and writes MADL natively.
+4. Docs site, then the first dated revision.
+5. Later: Python and TypeScript packages, the CAMEL adapter.
