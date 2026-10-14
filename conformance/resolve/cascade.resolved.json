@@ -3,25 +3,25 @@
     {
       "id": "a",
       "preferences": {
-        "runtime": "codex",
         "model": "anthropic/claude-opus-5-5",
         "options": {
           "effort": "medium",
           "sandbox": {
             "network": true
           }
-        }
+        },
+        "runtime": "codex"
       },
       "restrictions": {
+        "budget": {
+          "tokens": 500000,
+          "wall_clock": "2h"
+        },
         "tools": {
           "deny": [
             "web-fetch",
             "shell"
           ]
-        },
-        "budget": {
-          "tokens": 500000,
-          "wall_clock": "2h"
         }
       },
       "sources": {
@@ -39,15 +39,15 @@
           "runtime": "codex"
         },
         "restrictions": {
+          "budget": {
+            "tokens": 500000,
+            "wall_clock": "2h"
+          },
           "tools": {
             "deny": [
               "web-fetch",
               "shell"
             ]
-          },
-          "budget": {
-            "tokens": 500000,
-            "wall_clock": "2h"
           }
         },
         "sources": {
@@ -61,24 +61,24 @@
     {
       "id": "b",
       "preferences": {
-        "runtime": "claude-code",
         "model": "anthropic/claude-sonnet-5-5",
         "options": {
           "effort": "medium",
           "sandbox": {
             "network": false
           }
-        }
+        },
+        "runtime": "claude-code"
       },
       "restrictions": {
+        "budget": {
+          "tokens": 1000000,
+          "wall_clock": "2h"
+        },
         "tools": {
           "deny": [
             "web-fetch"
           ]
-        },
-        "budget": {
-          "tokens": 1000000,
-          "wall_clock": "2h"
         }
       },
       "sources": {
@@ -95,14 +95,14 @@
           "runtime": "claude-code"
         },
         "restrictions": {
+          "budget": {
+            "tokens": 1000000,
+            "wall_clock": "2h"
+          },
           "tools": {
             "deny": [
               "web-fetch"
             ]
-          },
-          "budget": {
-            "tokens": 1000000,
-            "wall_clock": "2h"
           }
         },
         "sources": {

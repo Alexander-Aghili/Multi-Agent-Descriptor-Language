@@ -1,4 +1,19 @@
 {
+  "channels": [
+    [
+      "chat",
+      "direct",
+      {}
+    ],
+    [
+      "blackboard-4-board",
+      "blackboard",
+      {
+        "w1": "read-write",
+        "w2": "read-write"
+      }
+    ]
+  ],
   "connections": [
     [
       "p1",
@@ -79,21 +94,6 @@
       "debate-3",
       null,
       null
-    ]
-  ],
-  "channels": [
-    [
-      "chat",
-      "direct",
-      {}
-    ],
-    [
-      "blackboard-4-board",
-      "blackboard",
-      {
-        "w1": "read-write",
-        "w2": "read-write"
-      }
     ]
   ]
 }

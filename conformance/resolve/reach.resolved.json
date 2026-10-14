@@ -23,13 +23,13 @@
           "model": "anthropic/claude-haiku-5-5"
         },
         "restrictions": {
+          "spawn": {
+            "max_depth": 1
+          },
           "tools": {
             "allow": [
               "fs"
             ]
-          },
-          "spawn": {
-            "max_depth": 1
           }
         },
         "sources": {

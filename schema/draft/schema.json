@@ -5,47 +5,10 @@
   "description": "A MADL document after `$ref` resolution: one multi-agent system.",
   "type": "object",
   "properties": {
-    "madl": {
-      "description": "The spec revision this document is written against: `draft` or a dated revision.",
-      "type": "string"
-    },
-    "system": {
-      "$ref": "#/$defs/System"
-    },
-    "defaults": {
-      "description": "Global settings: they apply to every agent unless a group or the agent overrides them.",
-      "anyOf": [
-        {
-          "$ref": "#/$defs/Settings"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "inputs": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/Input"
-      }
-    },
-    "groups": {
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/Group"
-      }
-    },
     "agents": {
       "type": "array",
       "items": {
         "$ref": "#/$defs/Agent"
-      }
-    },
-    "steps": {
-      "description": "Nodes that are not agents: checks, people's decisions, merges, fan-out and fan-in.",
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/Step"
       }
     },
     "channels": {
@@ -53,13 +16,6 @@
       "type": "array",
       "items": {
         "$ref": "#/$defs/Channel"
-      }
-    },
-    "connections": {
-      "description": "Directed, committed lines of communication between agents, groups and steps.",
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/Connection"
       }
     },
     "communication": {
@@ -73,25 +29,39 @@
         }
       ]
     },
-    "topology": {
+    "connections": {
+      "description": "Directed, committed lines of communication between agents, groups and steps.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Connection"
+      }
+    },
+    "defaults": {
+      "description": "Global settings: they apply to every agent unless a group or the agent overrides them.",
       "anyOf": [
         {
-          "$ref": "#/$defs/Topology"
+          "$ref": "#/$defs/Settings"
         },
         {
           "type": "null"
         }
       ]
     },
-    "policies": {
-      "anyOf": [
-        {
-          "$ref": "#/$defs/Policies"
-        },
-        {
-          "type": "null"
-        }
-      ]
+    "extensions": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Group"
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Input"
+      }
     },
     "layout": {
       "description": "How to draw the system. It has no meaning for execution.",
@@ -104,9 +74,39 @@
         }
       ]
     },
-    "extensions": {
-      "type": "object",
-      "additionalProperties": true
+    "madl": {
+      "description": "The spec revision this document is written against: `draft` or a dated revision.",
+      "type": "string"
+    },
+    "policies": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Policies"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "steps": {
+      "description": "Nodes that are not agents: checks, people's decisions, merges, fan-out and fan-in.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Step"
+      }
+    },
+    "system": {
+      "$ref": "#/$defs/System"
+    },
+    "topology": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Topology"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
   },
   "additionalProperties": false,
@@ -115,79 +115,62 @@
     "system"
   ],
   "$defs": {
-    "System": {
-      "description": "What the system is.",
+    "Access": {
+      "type": "string",
+      "enum": [
+        "read",
+        "write",
+        "read-write"
+      ]
+    },
+    "Agent": {
+      "description": "One participant: a model-driven agent, a remote agent or a person.",
       "type": "object",
       "properties": {
-        "id": {
-          "description": "Stable identifier: letters, digits, `-` and `_`, starting with a letter or digit.",
-          "type": "string"
+        "checks": {
+          "description": "Commands run to check the agent's work.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Check"
+          }
         },
-        "name": {
-          "type": "string"
+        "context": {
+          "description": "Files given to the agent as context, relative to the document.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
-        "description": {
+        "endpoint": {
+          "description": "For `runtime: remote-a2a`: the agent's A2A endpoint or Agent Card URL.",
           "type": [
             "string",
             "null"
           ]
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "name"
-      ]
-    },
-    "Settings": {
-      "description": "The same shape at the root (`defaults`), on a group, on an agent, and for subagents.",
-      "type": "object",
-      "properties": {
-        "preferences": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Preferences"
-            },
-            {
-              "type": "null"
-            }
-          ]
         },
-        "restrictions": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Restrictions"
-            },
-            {
-              "type": "null"
-            }
-          ]
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
         },
-        "applies_to": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/AppliesTo"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "Preferences": {
-      "description": "Overridable choices. The nearest value wins: a scalar or list replaces, `options` merges key\nby key.",
-      "type": "object",
-      "properties": {
-        "runtime": {
-          "description": "`claude-code`, `codex`, `camel`, `crewai`, `langgraph`, `openai-agents`, `remote-a2a`,\n`human`, or `x-<vendor>-<name>`.",
+        "groups": {
+          "description": "The groups the agent belongs to, by id. An agent may be in no group.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "instructions": {
+          "description": "The agent's job, in plain text (often a `$ref` to a Markdown file).",
           "type": [
             "string",
             "null"
           ]
         },
         "model": {
+          "description": "Shorthand for `settings.preferences.model`.",
           "anyOf": [
             {
               "$ref": "#/$defs/ModelRef"
@@ -197,14 +180,32 @@
             }
           ]
         },
-        "protocol": {
-          "description": "The default protocol for communication: `native`, `a2a@<version>`, `mcp@<version>`, or\n`x-<vendor>-<name>[@<version>]`.",
+        "name": {
           "type": [
             "string",
             "null"
           ]
         },
+        "outputs": {
+          "description": "What the agent produces.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Output"
+          }
+        },
+        "placement": {
+          "description": "Where the agent runs: a selector over machine properties such as `os` or `name`.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Placement"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "resume": {
+          "description": "Shorthand for `settings.preferences.resume`.",
           "anyOf": [
             {
               "$ref": "#/$defs/Resume"
@@ -214,289 +215,113 @@
             }
           ]
         },
-        "language": {
-          "description": "The language agents write in, as a BCP 47 tag.",
+        "runtime": {
+          "description": "Shorthand for `settings.preferences.runtime`.",
           "type": [
             "string",
             "null"
           ]
         },
-        "questions": {
+        "settings": {
           "anyOf": [
             {
-              "$ref": "#/$defs/Questions"
+              "$ref": "#/$defs/Settings"
             },
             {
               "type": "null"
             }
           ]
         },
-        "options": {
-          "description": "Runtime-specific options, merged key by key down the chain.",
-          "type": "object",
-          "additionalProperties": true
-        }
-      },
-      "additionalProperties": false
-    },
-    "ModelRef": {
-      "description": "A model as `provider/model`, optionally with fallbacks tried in order.",
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            },
-            "fallback": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "required": [
-            "id"
-          ]
-        }
-      ]
-    },
-    "Resume": {
-      "type": "string",
-      "enum": [
-        "resume-if-possible",
-        "relaunch-fresh",
-        "checkpoint-only"
-      ]
-    },
-    "Questions": {
-      "description": "What happens when an agent asks a person something.",
-      "type": "object",
-      "properties": {
-        "timeout": {
-          "description": "How long to wait for an answer, e.g. `30m`.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "on_timeout": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/OnTimeout"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "OnTimeout": {
-      "oneOf": [
-        {
-          "type": "string",
-          "enum": [
-            "stop"
-          ]
-        },
-        {
-          "description": "The agent continues with its own best judgment.",
-          "type": "string",
-          "const": "continue"
-        },
-        {
-          "description": "The agent waits until someone answers.",
-          "type": "string",
-          "const": "wait"
-        }
-      ]
-    },
-    "Restrictions": {
-      "description": "Limits. Down the chain they can only tighten; loosening one is an error.",
-      "type": "object",
-      "properties": {
-        "tools": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/ToolRule"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "files": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FileRule"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "network": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Network"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "budget": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Budget"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "spawn": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Spawn"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "approvals": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Approvals"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "communication": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Communication"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "ToolRule": {
-      "description": "`allow`: only these tools (absent: every tool the agent is given). `deny`: never these.\nTools are named by tool id, `<tool id>/<tool name>` for one MCP tool, or `<runtime>:<name>`.",
-      "type": "object",
-      "properties": {
-        "allow": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
-        "deny": {
+        "skills": {
+          "description": "Skills by path or name.",
           "type": "array",
           "items": {
             "type": "string"
           }
-        }
-      },
-      "additionalProperties": false
-    },
-    "FileRule": {
-      "description": "Paths the agent may read and write, relative to the document. Absent: no limit.",
-      "type": "object",
-      "properties": {
-        "read": {
-          "type": [
-            "array",
-            "null"
-          ],
+        },
+        "subagents": {
+          "description": "What agents this one spawns start as, and the settings they get.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Subagents"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tools": {
+          "description": "Tools the agent is given. Restrictions decide which of them it may use.",
+          "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/Tool"
           }
         },
-        "write": {
-          "type": [
-            "array",
-            "null"
-          ],
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "Network": {
-      "type": "object",
-      "properties": {
-        "egress": {
-          "$ref": "#/$defs/Egress"
+        "workspace": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Workspace"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "additionalProperties": false,
       "required": [
-        "egress"
+        "id"
       ]
     },
-    "Egress": {
-      "description": "`deny` (no network), `allow` (any host), or a list of hosts.",
-      "anyOf": [
-        {
-          "$ref": "#/$defs/EgressRule"
+    "AppliesTo": {
+      "description": "How far this block's preferences and restrictions reach. Defaults: preferences `self`,\nrestrictions `descendants`.",
+      "type": "object",
+      "properties": {
+        "preferences": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Reach"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
-        {
+        "restrictions": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Reach"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "Approvals": {
+      "type": "object",
+      "properties": {
+        "required_for": {
+          "description": "Actions that need a person's approval first, e.g. `shell`, `network`,\n`write-outside-workspace`, or a tool name.",
           "type": "array",
           "items": {
             "type": "string"
           }
         }
-      ]
-    },
-    "EgressRule": {
-      "type": "string",
-      "enum": [
-        "deny",
-        "allow"
-      ]
+      },
+      "additionalProperties": false
     },
     "Budget": {
       "type": "object",
       "properties": {
-        "tokens": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "format": "uint64",
-          "minimum": 0
-        },
         "cost_usd": {
           "type": [
             "number",
             "null"
           ],
           "format": "double"
-        },
-        "wall_clock": {
-          "description": "A duration such as `90s`, `30m`, `2h` or `1h30m`.",
-          "type": [
-            "string",
-            "null"
-          ]
         },
         "scope": {
           "anyOf": [
@@ -506,6 +331,21 @@
             {
               "type": "null"
             }
+          ]
+        },
+        "tokens": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        },
+        "wall_clock": {
+          "description": "A duration such as `90s`, `30m`, `2h` or `1h30m`.",
+          "type": [
+            "string",
+            "null"
           ]
         }
       },
@@ -525,53 +365,135 @@
         }
       ]
     },
-    "Spawn": {
+    "Carried": {
       "type": "object",
       "properties": {
-        "allowed": {
+        "artifact": {
           "type": [
-            "boolean",
+            "string",
             "null"
           ]
         },
-        "max_children": {
-          "description": "Most agents one agent may spawn.",
+        "message": {
           "type": [
-            "integer",
+            "string",
             "null"
-          ],
-          "format": "uint32",
-          "minimum": 0
-        },
-        "max_depth": {
-          "description": "Most levels below the agent: 1 lets it spawn agents that cannot spawn their own.",
-          "type": [
-            "integer",
-            "null"
-          ],
-          "format": "uint32",
-          "minimum": 0
+          ]
         }
       },
       "additionalProperties": false
     },
-    "Approvals": {
+    "Channel": {
+      "description": "Where messages or artifacts travel.",
       "type": "object",
       "properties": {
-        "required_for": {
-          "description": "Actions that need a person's approval first, e.g. `shell`, `network`,\n`write-outside-workspace`, or a tool name.",
-          "type": "array",
-          "items": {
+        "access": {
+          "description": "Members and their rights. Absent: the agents whose connections use the channel.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Access"
+          }
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "id": {
+          "type": "string"
+        },
+        "medium": {
+          "description": "`direct`, `filesystem`, `shared-memory`, `blackboard`, `bus`, `git`, `tracker`, `human`, or\n`x-<vendor>-<name>`.",
+          "type": "string"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "path": {
+          "description": "`filesystem`: the folder, relative to the document.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "protocol": {
+          "description": "Overrides the default protocol for traffic on this channel.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reach": {
+          "description": "`human`: how people are reached, e.g. `{ slack: \"#cad-review\" }`, `{ email: \"…\" }`.",
+          "type": "object",
+          "additionalProperties": {
             "type": "string"
           }
+        },
+        "topic": {
+          "description": "`bus`: the topic.",
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "medium"
+      ]
+    },
+    "Check": {
+      "type": "object",
+      "properties": {
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CheckWhen"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "command": {
+          "description": "A shell command run in the agent's folder; exit 0 means passed.",
+          "type": "string"
+        },
+        "timeout_s": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "command"
+      ]
+    },
+    "CheckWhen": {
+      "type": "string",
+      "enum": [
+        "each-turn",
+        "finish"
+      ]
     },
     "Communication": {
       "description": "The communication mode and bans, at the root or as a restriction.",
       "type": "object",
       "properties": {
+        "deny": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DenyRule"
+          }
+        },
         "mode": {
           "anyOf": [
             {
@@ -581,12 +503,6 @@
               "type": "null"
             }
           ]
-        },
-        "deny": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/DenyRule"
-          }
         }
       },
       "additionalProperties": false
@@ -605,41 +521,114 @@
         }
       ]
     },
-    "DenyRule": {
-      "description": "A ban: `from` → `to` (one direction) or `between` (both). Ids may be agents or groups; `*`\nmatches anyone. `kinds` limits the ban to those kinds; empty bans every kind.",
+    "Connection": {
+      "description": "A directed, committed line of communication, with every detail of how it happens.",
       "type": "object",
       "properties": {
+        "carries": {
+          "description": "What passes along it, by artifact (an output id) or message type.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Carried"
+          }
+        },
+        "direction": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Direction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        },
         "from": {
+          "description": "An agent, group or step id. A group means every member.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Default: `<from>-<kind>-<to>`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "initiates": {
+          "description": "Who may open a conversation. Default: `from`.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Initiates"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/ConnectionKind"
+        },
+        "max_rounds": {
+          "description": "How often one piece of work may pass along it in a loop.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "mode": {
+          "description": "`sync`: the sender waits for a reply. Default: `async`.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SyncMode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pattern": {
+          "description": "Set by pattern expansion: the pattern this connection came from.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "protocol": {
+          "description": "Overrides the channel's protocol.",
           "type": [
             "string",
             "null"
           ]
         },
         "to": {
+          "type": "string"
+        },
+        "via": {
+          "description": "The channel used. Default: a direct channel with the default protocol.",
           "type": [
             "string",
             "null"
           ]
         },
-        "between": {
+        "when": {
+          "description": "A condition (CEL subset) that must hold for the connection to be used.",
           "type": [
-            "array",
+            "string",
             "null"
-          ],
-          "items": {
-            "type": "string"
-          },
-          "minItems": 2,
-          "maxItems": 2
-        },
-        "kinds": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/ConnectionKind"
-          }
+          ]
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "kind"
+      ]
     },
     "ConnectionKind": {
       "oneOf": [
@@ -680,388 +669,6 @@
         }
       ]
     },
-    "AppliesTo": {
-      "description": "How far this block's preferences and restrictions reach. Defaults: preferences `self`,\nrestrictions `descendants`.",
-      "type": "object",
-      "properties": {
-        "preferences": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Reach"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "restrictions": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Reach"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "Reach": {
-      "oneOf": [
-        {
-          "description": "The agents the block covers, not what they spawn.",
-          "type": "string",
-          "const": "self"
-        },
-        {
-          "description": "Only what those agents spawn, and what that spawns.",
-          "type": "string",
-          "const": "subagents"
-        },
-        {
-          "description": "The agents and everything they spawn.",
-          "type": "string",
-          "const": "descendants"
-        }
-      ]
-    },
-    "Input": {
-      "description": "Something the system is given when it starts: a goal, links, notes.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "text": {
-          "type": "string"
-        },
-        "to": {
-          "description": "The agents that receive it. Empty: the starting agents.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "text"
-      ]
-    },
-    "Group": {
-      "description": "A named set of agents that share a purpose and settings. Groups hold only the agents that\nlist them, and may nest.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "purpose": {
-          "description": "What the members share. Passed to every member and to agents connected to the group.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "parent": {
-          "description": "The enclosing group.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "settings": {
-          "description": "Settings for the group's members (and, by reach, their subagents).",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Settings"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "extensions": {
-          "type": "object",
-          "additionalProperties": true
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id"
-      ]
-    },
-    "Agent": {
-      "description": "One participant: a model-driven agent, a remote agent or a person.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "instructions": {
-          "description": "The agent's job, in plain text (often a `$ref` to a Markdown file).",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "runtime": {
-          "description": "Shorthand for `settings.preferences.runtime`.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "model": {
-          "description": "Shorthand for `settings.preferences.model`.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/ModelRef"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "resume": {
-          "description": "Shorthand for `settings.preferences.resume`.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Resume"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "endpoint": {
-          "description": "For `runtime: remote-a2a`: the agent's A2A endpoint or Agent Card URL.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "groups": {
-          "description": "The groups the agent belongs to, by id. An agent may be in no group.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "tools": {
-          "description": "Tools the agent is given. Restrictions decide which of them it may use.",
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Tool"
-          }
-        },
-        "skills": {
-          "description": "Skills by path or name.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "context": {
-          "description": "Files given to the agent as context, relative to the document.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "workspace": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Workspace"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "placement": {
-          "description": "Where the agent runs: a selector over machine properties such as `os` or `name`.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Placement"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "outputs": {
-          "description": "What the agent produces.",
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Output"
-          }
-        },
-        "checks": {
-          "description": "Commands run to check the agent's work.",
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Check"
-          }
-        },
-        "settings": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Settings"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "subagents": {
-          "description": "What agents this one spawns start as, and the settings they get.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Subagents"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "extensions": {
-          "type": "object",
-          "additionalProperties": true
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id"
-      ]
-    },
-    "Tool": {
-      "description": "A tool: an MCP server, or one of the runtime's built-in tools.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "description": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "mcp": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/McpServer"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "builtin": {
-          "description": "A runtime's own tool, as `<runtime>:<name>`, e.g. `claude-code:Bash`.",
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id"
-      ]
-    },
-    "McpServer": {
-      "description": "How to reach an MCP server: a command to start (stdio) or a URL (HTTP).",
-      "type": "object",
-      "properties": {
-        "command": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "args": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "env": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/$defs/EnvValue"
-          }
-        },
-        "url": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "EnvValue": {
-      "description": "A value given as text, or a secret the runner resolves. Secrets never appear in documents.",
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "$ref": "#/$defs/SecretRef"
-        }
-      ]
-    },
-    "SecretRef": {
-      "type": "object",
-      "properties": {
-        "secret": {
-          "description": "The secret's name in the runner's secret store.",
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "secret"
-      ]
-    },
-    "Workspace": {
-      "type": "object",
-      "properties": {
-        "folder": {
-          "description": "The agent's working folder, relative to the document.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "copy": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/CopyMode"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
     "CopyMode": {
       "description": "`own`: the agent works in its own git copy. `shared`: in the folder itself.",
       "oneOf": [
@@ -1079,430 +686,41 @@
         }
       ]
     },
-    "Placement": {
+    "DenyRule": {
+      "description": "A ban: `from` → `to` (one direction) or `between` (both). Ids may be agents or groups; `*`\nmatches anyone. `kinds` limits the ban to those kinds; empty bans every kind.",
       "type": "object",
       "properties": {
-        "machine": {
-          "description": "Every key must match the machine's property of the same name.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "machine"
-      ]
-    },
-    "Output": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "path": {
+        "between": {
           "type": [
-            "string",
-            "null"
-          ]
-        },
-        "description": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id"
-      ]
-    },
-    "Check": {
-      "type": "object",
-      "properties": {
-        "command": {
-          "description": "A shell command run in the agent's folder; exit 0 means passed.",
-          "type": "string"
-        },
-        "after": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/CheckWhen"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "timeout_s": {
-          "type": [
-            "integer",
+            "array",
             "null"
           ],
-          "format": "uint32",
-          "minimum": 0
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "command"
-      ]
-    },
-    "CheckWhen": {
-      "type": "string",
-      "enum": [
-        "each-turn",
-        "finish"
-      ]
-    },
-    "Subagents": {
-      "type": "object",
-      "properties": {
-        "template": {
-          "description": "What a spawned agent starts as. Its `id` is assigned at run time and is not given here.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/SubagentTemplate"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "settings": {
-          "description": "Settings for spawned agents only.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Settings"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "SubagentTemplate": {
-      "type": "object",
-      "properties": {
-        "instructions": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "runtime": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "model": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/ModelRef"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "tools": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Tool"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "Step": {
-      "description": "A node that is not an agent. Which fields apply depends on `kind`.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "kind": {
-          "$ref": "#/$defs/StepKind"
-        },
-        "name": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "command": {
-          "description": "`check`: the shell command; exit 0 means passed.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "timeout_s": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "format": "uint32",
-          "minimum": 0
-        },
-        "prompt": {
-          "description": "`human`: what the person decides.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "outcomes": {
-          "description": "`human`: the choices the person has.",
-          "type": "array",
           "items": {
             "type": "string"
-          }
-        },
-        "into": {
-          "description": "`merge`: the branch to merge into. Default: the project's current branch.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "over": {
-          "description": "`fan-out`: what to split into items (CEL subset), e.g. `inputs.parts`.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "copies": {
-          "description": "`fan-out`: how items' workspaces are made.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/CopyMode"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "join": {
-          "description": "`fan-in`: wait for all items, or continue on the first.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Join"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "kind"
-      ]
-    },
-    "StepKind": {
-      "type": "string",
-      "enum": [
-        "check",
-        "human",
-        "merge",
-        "fan-out",
-        "fan-in"
-      ]
-    },
-    "Join": {
-      "type": "string",
-      "enum": [
-        "all",
-        "any"
-      ]
-    },
-    "Channel": {
-      "description": "Where messages or artifacts travel.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "medium": {
-          "description": "`direct`, `filesystem`, `shared-memory`, `blackboard`, `bus`, `git`, `tracker`, `human`, or\n`x-<vendor>-<name>`.",
-          "type": "string"
-        },
-        "protocol": {
-          "description": "Overrides the default protocol for traffic on this channel.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "path": {
-          "description": "`filesystem`: the folder, relative to the document.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "topic": {
-          "description": "`bus`: the topic.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "access": {
-          "description": "Members and their rights. Absent: the agents whose connections use the channel.",
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/$defs/Access"
-          }
-        },
-        "reach": {
-          "description": "`human`: how people are reached, e.g. `{ slack: \"#cad-review\" }`, `{ email: \"…\" }`.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "extensions": {
-          "type": "object",
-          "additionalProperties": true
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "medium"
-      ]
-    },
-    "Access": {
-      "type": "string",
-      "enum": [
-        "read",
-        "write",
-        "read-write"
-      ]
-    },
-    "Connection": {
-      "description": "A directed, committed line of communication, with every detail of how it happens.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "description": "Default: `<from>-<kind>-<to>`.",
-          "type": [
-            "string",
-            "null"
-          ]
+          },
+          "maxItems": 2,
+          "minItems": 2
         },
         "from": {
-          "description": "An agent, group or step id. A group means every member.",
-          "type": "string"
-        },
-        "to": {
-          "type": "string"
-        },
-        "kind": {
-          "$ref": "#/$defs/ConnectionKind"
-        },
-        "direction": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Direction"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "via": {
-          "description": "The channel used. Default: a direct channel with the default protocol.",
           "type": [
             "string",
             "null"
           ]
         },
-        "protocol": {
-          "description": "Overrides the channel's protocol.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "initiates": {
-          "description": "Who may open a conversation. Default: `from`.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Initiates"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "mode": {
-          "description": "`sync`: the sender waits for a reply. Default: `async`.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/SyncMode"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "carries": {
-          "description": "What passes along it, by artifact (an output id) or message type.",
+        "kinds": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/Carried"
+            "$ref": "#/$defs/ConnectionKind"
           }
         },
-        "max_rounds": {
-          "description": "How often one piece of work may pass along it in a loop.",
-          "type": [
-            "integer",
-            "null"
-          ],
-          "format": "uint32",
-          "minimum": 0
-        },
-        "when": {
-          "description": "A condition (CEL subset) that must hold for the connection to be used.",
+        "to": {
           "type": [
             "string",
             "null"
           ]
-        },
-        "pattern": {
-          "description": "Set by pattern expansion: the pattern this connection came from.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "extensions": {
-          "type": "object",
-          "additionalProperties": true
         }
       },
-      "additionalProperties": false,
-      "required": [
-        "from",
-        "to",
-        "kind"
-      ]
+      "additionalProperties": false
     },
     "Direction": {
       "oneOf": [
@@ -1519,256 +737,58 @@
         }
       ]
     },
-    "Initiates": {
-      "type": "string",
-      "enum": [
-        "from",
-        "to",
-        "either"
-      ]
-    },
-    "SyncMode": {
-      "type": "string",
-      "enum": [
-        "async",
-        "sync"
-      ]
-    },
-    "Carried": {
-      "type": "object",
-      "properties": {
-        "artifact": {
-          "type": [
-            "string",
-            "null"
-          ]
+    "Egress": {
+      "description": "`deny` (no network), `allow` (any host), or a list of hosts.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EgressRule"
         },
-        "message": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "Topology": {
-      "type": "object",
-      "properties": {
-        "patterns": {
-          "description": "Shorthand that expands into connections (and, for `blackboard`, a channel).",
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Pattern"
-          }
-        },
-        "loops": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Loops"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false
-    },
-    "Pattern": {
-      "description": "A named shape. Which roles apply depends on `pattern`.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "description": "Default: `<pattern>-<position>`, counting from 1.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "pattern": {
-          "$ref": "#/$defs/PatternKind"
-        },
-        "members": {
+        {
           "type": "array",
           "items": {
             "type": "string"
           }
+        }
+      ]
+    },
+    "EgressRule": {
+      "type": "string",
+      "enum": [
+        "deny",
+        "allow"
+      ]
+    },
+    "EnvValue": {
+      "description": "A value given as text, or a secret the runner resolves. Secrets never appear in documents.",
+      "anyOf": [
+        {
+          "type": "string"
         },
-        "supervisor": {
-          "description": "`supervisor`: the agent that assigns work and receives reports.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "auctioneer": {
-          "description": "`auction`: the agent that runs the auction.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "source": {
-          "description": "`committee`: the agent that hands the work to every member.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "collector": {
-          "description": "`committee`: where members report. Default: the source.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "judge": {
-          "description": "`debate`: the agent members report to when the debate ends.",
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "routing": {
-          "description": "`supervisor`: `dynamic` (default) chooses at run time; `static` hands work to every member.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Routing"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "max_rounds": {
-          "description": "`debate`, `role-play`, `swarm`: the round limit put on the expanded connections.",
-          "type": [
-            "integer",
-            "null"
-          ],
+        {
+          "$ref": "#/$defs/SecretRef"
+        }
+      ]
+    },
+    "Escalation": {
+      "type": "object",
+      "properties": {
+        "after_rounds": {
+          "type": "integer",
           "format": "uint32",
           "minimum": 0
         },
-        "via": {
-          "description": "The channel the expanded connections use.",
-          "type": [
-            "string",
-            "null"
-          ]
+        "from": {
+          "type": "string"
         },
-        "protocol": {
-          "type": [
-            "string",
-            "null"
-          ]
+        "to": {
+          "type": "string"
         }
       },
       "additionalProperties": false,
       "required": [
-        "pattern",
-        "members"
-      ]
-    },
-    "PatternKind": {
-      "type": "string",
-      "enum": [
-        "pipeline",
-        "supervisor",
-        "committee",
-        "debate",
-        "role-play",
-        "auction",
-        "swarm",
-        "blackboard"
-      ]
-    },
-    "Routing": {
-      "type": "string",
-      "enum": [
-        "dynamic",
-        "static"
-      ]
-    },
-    "Loops": {
-      "type": "object",
-      "properties": {
-        "max_rounds": {
-          "description": "How often one piece of work may go round a loop, unless a connection on it says less.",
-          "type": [
-            "integer",
-            "null"
-          ],
-          "format": "uint32",
-          "minimum": 0
-        }
-      },
-      "additionalProperties": false
-    },
-    "Policies": {
-      "type": "object",
-      "properties": {
-        "on_failure": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/OnFailure"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "escalation": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Escalation"
-          }
-        },
-        "schedules": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Schedule"
-          }
-        },
-        "guards": {
-          "description": "Project checks that pause new work while they fail.",
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/Guard"
-          }
-        }
-      },
-      "additionalProperties": false
-    },
-    "OnFailure": {
-      "type": "object",
-      "properties": {
-        "strategy": {
-          "$ref": "#/$defs/FailureStrategy"
-        },
-        "max_attempts": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "format": "uint32",
-          "minimum": 0
-        },
-        "then": {
-          "description": "What to do once `max_attempts` is used up.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FailureStrategy"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "strategy"
+        "from",
+        "after_rounds",
+        "to"
       ]
     },
     "FailureStrategy": {
@@ -1797,51 +817,77 @@
         }
       ]
     },
-    "Escalation": {
+    "FileRule": {
+      "description": "Paths the agent may read and write, relative to the document. Absent: no limit.",
       "type": "object",
       "properties": {
-        "from": {
-          "type": "string"
+        "read": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
         },
-        "after_rounds": {
-          "type": "integer",
-          "format": "uint32",
-          "minimum": 0
-        },
-        "to": {
-          "type": "string"
+        "write": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
         }
       },
-      "additionalProperties": false,
-      "required": [
-        "from",
-        "after_rounds",
-        "to"
-      ]
+      "additionalProperties": false
     },
-    "Schedule": {
+    "Group": {
+      "description": "A named set of agents that share a purpose and settings. Groups hold only the agents that\nlist them, and may nest.",
       "type": "object",
       "properties": {
+        "extensions": {
+          "type": "object",
+          "additionalProperties": true
+        },
         "id": {
           "type": "string"
         },
-        "agent": {
-          "type": "string"
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
         },
-        "every": {
-          "description": "A duration such as `10m` or `24h`.",
-          "type": "string"
+        "parent": {
+          "description": "The enclosing group.",
+          "type": [
+            "string",
+            "null"
+          ]
         },
-        "message": {
-          "type": "string"
+        "purpose": {
+          "description": "What the members share. Passed to every member and to agents connected to the group.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "settings": {
+          "description": "Settings for the group's members (and, by reach, their subagents).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Settings"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "additionalProperties": false,
       "required": [
-        "id",
-        "agent",
-        "every",
-        "message"
+        "id"
       ]
     },
     "Guard": {
@@ -1868,15 +914,54 @@
         "every"
       ]
     },
+    "Initiates": {
+      "type": "string",
+      "enum": [
+        "from",
+        "to",
+        "either"
+      ]
+    },
+    "Input": {
+      "description": "Something the system is given when it starts: a goal, links, notes.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "to": {
+          "description": "The agents that receive it. Empty: the starting agents.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "text"
+      ]
+    },
+    "Join": {
+      "type": "string",
+      "enum": [
+        "all",
+        "any"
+      ]
+    },
     "Layout": {
       "description": "Positions for drawing. Writers keep the entries of components they did not change.",
       "type": "object",
       "properties": {
-        "units": {
-          "type": [
-            "string",
-            "null"
-          ]
+        "groups": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Rect"
+          }
         },
         "nodes": {
           "description": "Agents, steps and inputs, by id.",
@@ -1885,14 +970,296 @@
             "$ref": "#/$defs/Point"
           }
         },
-        "groups": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/$defs/Rect"
-          }
+        "units": {
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "additionalProperties": false
+    },
+    "Loops": {
+      "type": "object",
+      "properties": {
+        "max_rounds": {
+          "description": "How often one piece of work may go round a loop, unless a connection on it says less.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "McpServer": {
+      "description": "How to reach an MCP server: a command to start (stdio) or a URL (HTTP).",
+      "type": "object",
+      "properties": {
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/EnvValue"
+          }
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "ModelRef": {
+      "description": "A model as `provider/model`, optionally with fallbacks tried in order.",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "fallback": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ]
+    },
+    "Network": {
+      "type": "object",
+      "properties": {
+        "egress": {
+          "$ref": "#/$defs/Egress"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "egress"
+      ]
+    },
+    "OnFailure": {
+      "type": "object",
+      "properties": {
+        "max_attempts": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "strategy": {
+          "$ref": "#/$defs/FailureStrategy"
+        },
+        "then": {
+          "description": "What to do once `max_attempts` is used up.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FailureStrategy"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "strategy"
+      ]
+    },
+    "OnTimeout": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "stop"
+          ]
+        },
+        {
+          "description": "The agent continues with its own best judgment.",
+          "type": "string",
+          "const": "continue"
+        },
+        {
+          "description": "The agent waits until someone answers.",
+          "type": "string",
+          "const": "wait"
+        }
+      ]
+    },
+    "Output": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ]
+    },
+    "Pattern": {
+      "description": "A named shape. Which roles apply depends on `pattern`.",
+      "type": "object",
+      "properties": {
+        "auctioneer": {
+          "description": "`auction`: the agent that runs the auction.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "collector": {
+          "description": "`committee`: where members report. Default: the source.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "description": "Default: `<pattern>-<position>`, counting from 1.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "judge": {
+          "description": "`debate`: the agent members report to when the debate ends.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "max_rounds": {
+          "description": "`debate`, `role-play`, `swarm`: the round limit put on the expanded connections.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pattern": {
+          "$ref": "#/$defs/PatternKind"
+        },
+        "protocol": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "routing": {
+          "description": "`supervisor`: `dynamic` (default) chooses at run time; `static` hands work to every member.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Routing"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "description": "`committee`: the agent that hands the work to every member.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "supervisor": {
+          "description": "`supervisor`: the agent that assigns work and receives reports.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "via": {
+          "description": "The channel the expanded connections use.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "pattern",
+        "members"
+      ]
+    },
+    "PatternKind": {
+      "type": "string",
+      "enum": [
+        "pipeline",
+        "supervisor",
+        "committee",
+        "debate",
+        "role-play",
+        "auction",
+        "swarm",
+        "blackboard"
+      ]
+    },
+    "Placement": {
+      "type": "object",
+      "properties": {
+        "machine": {
+          "description": "Every key must match the machine's property of the same name.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "machine"
+      ]
     },
     "Point": {
       "type": "object",
@@ -1912,14 +1279,151 @@
         "y"
       ]
     },
+    "Policies": {
+      "type": "object",
+      "properties": {
+        "escalation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Escalation"
+          }
+        },
+        "guards": {
+          "description": "Project checks that pause new work while they fail.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Guard"
+          }
+        },
+        "on_failure": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OnFailure"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schedules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Schedule"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Preferences": {
+      "description": "Overridable choices. The nearest value wins: a scalar or list replaces, `options` merges key\nby key.",
+      "type": "object",
+      "properties": {
+        "language": {
+          "description": "The language agents write in, as a BCP 47 tag.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "options": {
+          "description": "Runtime-specific options, merged key by key down the chain.",
+          "type": "object",
+          "additionalProperties": true
+        },
+        "protocol": {
+          "description": "The default protocol for communication: `native`, `a2a@<version>`, `mcp@<version>`, or\n`x-<vendor>-<name>[@<version>]`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "questions": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Questions"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "resume": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Resume"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "runtime": {
+          "description": "`claude-code`, `codex`, `camel`, `crewai`, `langgraph`, `openai-agents`, `remote-a2a`,\n`human`, or `x-<vendor>-<name>`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "Questions": {
+      "description": "What happens when an agent asks a person something.",
+      "type": "object",
+      "properties": {
+        "on_timeout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OnTimeout"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timeout": {
+          "description": "How long to wait for an answer, e.g. `30m`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "Reach": {
+      "oneOf": [
+        {
+          "description": "The agents the block covers, not what they spawn.",
+          "type": "string",
+          "const": "self"
+        },
+        {
+          "description": "Only what those agents spawn, and what that spawns.",
+          "type": "string",
+          "const": "subagents"
+        },
+        {
+          "description": "The agents and everything they spawn.",
+          "type": "string",
+          "const": "descendants"
+        }
+      ]
+    },
     "Rect": {
       "type": "object",
       "properties": {
-        "x": {
-          "type": "number",
-          "format": "double"
-        },
-        "y": {
+        "h": {
           "type": "number",
           "format": "double"
         },
@@ -1927,7 +1431,11 @@
           "type": "number",
           "format": "double"
         },
-        "h": {
+        "x": {
+          "type": "number",
+          "format": "double"
+        },
+        "y": {
           "type": "number",
           "format": "double"
         }
@@ -1939,6 +1447,498 @@
         "w",
         "h"
       ]
+    },
+    "Restrictions": {
+      "description": "Limits. Down the chain they can only tighten; loosening one is an error.",
+      "type": "object",
+      "properties": {
+        "approvals": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Approvals"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "budget": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Budget"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "communication": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Communication"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "files": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FileRule"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "network": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Network"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "spawn": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Spawn"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tools": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ToolRule"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "Resume": {
+      "type": "string",
+      "enum": [
+        "resume-if-possible",
+        "relaunch-fresh",
+        "checkpoint-only"
+      ]
+    },
+    "Routing": {
+      "type": "string",
+      "enum": [
+        "dynamic",
+        "static"
+      ]
+    },
+    "Schedule": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "type": "string"
+        },
+        "every": {
+          "description": "A duration such as `10m` or `24h`.",
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "agent",
+        "every",
+        "message"
+      ]
+    },
+    "SecretRef": {
+      "type": "object",
+      "properties": {
+        "secret": {
+          "description": "The secret's name in the runner's secret store.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "secret"
+      ]
+    },
+    "Settings": {
+      "description": "The same shape at the root (`defaults`), on a group, on an agent, and for subagents.",
+      "type": "object",
+      "properties": {
+        "applies_to": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AppliesTo"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "preferences": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Preferences"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "restrictions": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Restrictions"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "Spawn": {
+      "type": "object",
+      "properties": {
+        "allowed": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "max_children": {
+          "description": "Most agents one agent may spawn.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "max_depth": {
+          "description": "Most levels below the agent: 1 lets it spawn agents that cannot spawn their own.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "Step": {
+      "description": "A node that is not an agent. Which fields apply depends on `kind`.",
+      "type": "object",
+      "properties": {
+        "command": {
+          "description": "`check`: the shell command; exit 0 means passed.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "copies": {
+          "description": "`fan-out`: how items' workspaces are made.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CopyMode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "into": {
+          "description": "`merge`: the branch to merge into. Default: the project's current branch.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "join": {
+          "description": "`fan-in`: wait for all items, or continue on the first.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Join"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/StepKind"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "outcomes": {
+          "description": "`human`: the choices the person has.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "over": {
+          "description": "`fan-out`: what to split into items (CEL subset), e.g. `inputs.parts`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "prompt": {
+          "description": "`human`: what the person decides.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "timeout_s": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind"
+      ]
+    },
+    "StepKind": {
+      "type": "string",
+      "enum": [
+        "check",
+        "human",
+        "merge",
+        "fan-out",
+        "fan-in"
+      ]
+    },
+    "SubagentTemplate": {
+      "type": "object",
+      "properties": {
+        "instructions": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "runtime": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Tool"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Subagents": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "description": "Settings for spawned agents only.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Settings"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "template": {
+          "description": "What a spawned agent starts as. Its `id` is assigned at run time and is not given here.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubagentTemplate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "SyncMode": {
+      "type": "string",
+      "enum": [
+        "async",
+        "sync"
+      ]
+    },
+    "System": {
+      "description": "What the system is.",
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "description": "Stable identifier: letters, digits, `-` and `_`, starting with a letter or digit.",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "Tool": {
+      "description": "A tool: an MCP server, or one of the runtime's built-in tools.",
+      "type": "object",
+      "properties": {
+        "builtin": {
+          "description": "A runtime's own tool, as `<runtime>:<name>`, e.g. `claude-code:Bash`.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": "string"
+        },
+        "mcp": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/McpServer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ]
+    },
+    "ToolRule": {
+      "description": "`allow`: only these tools (absent: every tool the agent is given). `deny`: never these.\nTools are named by tool id, `<tool id>/<tool name>` for one MCP tool, or `<runtime>:<name>`.",
+      "type": "object",
+      "properties": {
+        "allow": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "deny": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Topology": {
+      "type": "object",
+      "properties": {
+        "loops": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Loops"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "patterns": {
+          "description": "Shorthand that expands into connections (and, for `blackboard`, a channel).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Pattern"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Workspace": {
+      "type": "object",
+      "properties": {
+        "copy": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CopyMode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "folder": {
+          "description": "The agent's working folder, relative to the document.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
     }
   }
 }
