@@ -6,6 +6,9 @@ version.workspace = true
 license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
+readme = "README.md"
+keywords = ["multi-agent", "agents", "specification", "schema", "a2a"]
+categories = ["parser-implementations", "development-tools"]
 
 [dependencies]
 serde.workspace = true

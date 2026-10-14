@@ -2,6 +2,7 @@
 //! arrow style per connection kind.
 use crate::expand::kind_name;
 use crate::model::{ConnectionKind, Direction, Document, StepKind};
+use std::collections::BTreeMap;
 use std::fmt::Write;
 
 /// The flowchart, for an expanded document (patterns already turned into connections).
@@ -11,11 +12,12 @@ pub fn flowchart(doc: &Document) -> String {
         let text = label(&format!("Input: {}", first_line(&input.text)));
         let _ = writeln!(out, "  {}([\"{text}\"])", node(&input.id));
     }
+    let rt = runtimes(doc);
     for g in (0..doc.groups.len()).filter(|&i| doc.groups[i].parent.is_none()) {
-        group(doc, g, 1, &mut out);
+        group(doc, &rt, g, 1, &mut out);
     }
     for a in doc.agents.iter().filter(|a| a.groups.is_empty()) {
-        agent_line(doc, &a.id, 1, &mut out);
+        agent_line(doc, &rt, &a.id, 1, &mut out);
     }
     steps(doc, &mut out);
     arrows(doc, &mut out);
@@ -53,28 +55,34 @@ fn steps(doc: &Document, out: &mut String) {
     }
 }
 
-fn group(doc: &Document, g: usize, depth: usize, out: &mut String) {
+/// Each agent's effective runtime (its own, a group's, or the defaults').
+fn runtimes(doc: &Document) -> BTreeMap<String, String> {
+    let resolved = crate::resolve::resolve(doc);
+    resolved.agents.into_iter().filter_map(|a| Some((a.id, a.settings.preferences.runtime?))).collect()
+}
+
+fn group(doc: &Document, rt: &BTreeMap<String, String>, g: usize, depth: usize, out: &mut String) {
     let pad = "  ".repeat(depth);
     let gr = &doc.groups[g];
     let _ = writeln!(out, "{pad}subgraph {}[\"{}\"]", node(&gr.id), label(gr.name.as_deref().unwrap_or(&gr.id)));
     for (i, child) in doc.groups.iter().enumerate() {
         if child.parent.as_deref() == Some(&gr.id) && i != g {
-            group(doc, i, depth + 1, out);
+            group(doc, rt, i, depth + 1, out);
         }
     }
     for a in doc.agents.iter().filter(|a| a.groups.first() == Some(&gr.id)) {
-        agent_line(doc, &a.id, depth + 1, out);
+        agent_line(doc, rt, &a.id, depth + 1, out);
     }
     let _ = writeln!(out, "{pad}end");
 }
 
-fn agent_line(doc: &Document, id: &str, depth: usize, out: &mut String) {
+fn agent_line(doc: &Document, rt: &BTreeMap<String, String>, id: &str, depth: usize, out: &mut String) {
     let Some(a) = doc.agents.iter().find(|a| a.id == id) else {
         return;
     };
     let name = label(a.name.as_deref().unwrap_or(&a.id));
-    let runtime = a.runtime.as_deref().map(|r| format!("<br/><small>{}</small>", label(r))).unwrap_or_default();
-    let open = if a.runtime.as_deref() == Some("human") { "((" } else { "[" };
+    let runtime = rt.get(&a.id).map(|r| format!("<br/><small>{}</small>", label(r))).unwrap_or_default();
+    let open = if rt.get(&a.id).map(String::as_str) == Some("human") { "((" } else { "[" };
     let close = if open == "((" { "))" } else { "]" };
     let _ = writeln!(out, "{}{}{open}\"{name}{runtime}\"{close}", "  ".repeat(depth), node(&a.id));
 }

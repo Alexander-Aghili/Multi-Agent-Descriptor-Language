@@ -1,0 +1,5 @@
+* text=auto eol=lf
+schema/**/schema.json linguist-generated=true
+bindings/** linguist-generated=true
+conformance/**/*.resolved.json linguist-generated=true
+conformance/**/*.expanded.json linguist-generated=true

@@ -1,0 +1,28 @@
+name: MADL Enhancement Proposal (MEP)
+description: Propose a change to what a MADL document can say or means.
+title: "MEP: "
+labels: [mep]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What can't be described today, or is described badly? A real system that needs it helps most.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: The new or changed members, with a short example document.
+    validations:
+      required: true
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility
+      description: Which existing documents change meaning or become invalid, and how they migrate.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered

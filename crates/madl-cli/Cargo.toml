@@ -6,6 +6,9 @@ version.workspace = true
 license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
+readme = "README.md"
+keywords = ["multi-agent", "agents", "cli", "validator"]
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "madl"

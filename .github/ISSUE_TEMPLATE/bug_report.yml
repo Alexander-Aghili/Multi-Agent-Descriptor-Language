@@ -1,0 +1,23 @@
+name: Bug report
+description: The reference implementation or the CLI does something the spec says it should not.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran, what you expected, and what you got.
+    validations:
+      required: true
+  - type: textarea
+    id: document
+    attributes:
+      label: The smallest document that shows it
+      render: yaml
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `madl --version`, or the commit.
