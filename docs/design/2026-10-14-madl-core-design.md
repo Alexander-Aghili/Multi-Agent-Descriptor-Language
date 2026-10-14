@@ -555,7 +555,7 @@ README.md  LICENSE (Apache-2.0)  LICENSE-SPEC (CC-BY-4.0)  CHANGELOG.md
 GOVERNANCE.md  CONTRIBUTING.md  SECURITY.md  CODE_OF_CONDUCT.md
 spec/draft/            index, document, participants, settings, communication, topology,
                        policies, layout, extensions, conformance, security, interop
-schema/draft/          schema.ts, schema.json
+schema/draft/          schema.json (generated)
 examples/              pipeline, supervisor, debate, role-play, coding team, CAD review,
                        textbook team, human approval, open swarm with bans
 conformance/           valid/ invalid/ resolve/
