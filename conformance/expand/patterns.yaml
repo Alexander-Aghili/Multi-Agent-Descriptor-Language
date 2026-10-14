@@ -1,0 +1,22 @@
+madl: draft
+system: { id: patterns, name: Patterns }
+agents:
+  - { id: s }
+  - { id: w1 }
+  - { id: w2 }
+  - { id: p1 }
+  - { id: p2 }
+  - { id: p3 }
+  - { id: x }
+  - { id: y }
+  - { id: judge }
+connections:
+  - { from: p1, to: p2, kind: handoff, via: chat }
+channels:
+  - { id: chat, medium: direct }
+topology:
+  patterns:
+    - { pattern: supervisor, supervisor: s, members: [w1, w2] }
+    - { id: line, pattern: pipeline, members: [p1, p2, p3] }
+    - { pattern: debate, members: [x, y], judge: judge, max_rounds: 2 }
+    - { pattern: blackboard, members: [w1, w2] }

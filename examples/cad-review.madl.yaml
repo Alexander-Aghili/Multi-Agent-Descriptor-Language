@@ -1,0 +1,117 @@
+# A CAD team: a planner hands a design brief to a CAD engineer, a reviewer sends changes back
+# (a loop with a starting point), a check runs, and a person signs off.
+madl: draft
+system:
+  id: cad-review
+  name: CAD review team
+  description: Designs a bracket, checks it, and reviews it before release.
+
+defaults:
+  preferences:
+    runtime: claude-code
+    model: anthropic/claude-sonnet-5-5
+    protocol: native
+    questions: { timeout: 30m, on_timeout: continue }
+  restrictions:
+    tools: { deny: [web-fetch] }
+    files: { read: ["."], write: ["./cad", "./reports"] }
+    network: { egress: [pypi.org, github.com] }
+    budget: { tokens: 4000000, cost_usd: 40, wall_clock: 3h, scope: shared }
+    spawn: { max_children: 3, max_depth: 1 }
+    approvals: { required_for: [write-outside-workspace] }
+
+inputs:
+  - id: brief
+    text: |
+      Design a wall bracket that holds 20 kg, prints without supports, and uses two M5 screws.
+    to: [planner]
+
+groups:
+  - id: design
+    name: Design
+    purpose: Produce a manufacturable bracket that meets the brief.
+    settings:
+      preferences: { model: anthropic/claude-opus-5-5 }
+
+agents:
+  - id: planner
+    name: Planner
+    instructions: Turn the brief into numbered requirements and hand them to the CAD engineer.
+    groups: [design]
+  - id: cad
+    name: CAD engineer
+    runtime: codex
+    model: openai/gpt-6-sol
+    instructions: Model the bracket in CadQuery and export a STEP file.
+    groups: [design]
+    workspace: { folder: ./cad, copy: own }
+    placement: { machine: { os: linux } }
+    tools:
+      - id: cad-kernel
+        mcp: { command: uvx, args: [cadquery-mcp], env: { LICENSE_KEY: { secret: CAD_LICENSE } } }
+    outputs: [ { id: model, path: ./cad/bracket.step } ]
+    checks: [ { command: "python -m pytest tests", after: each-turn, timeout_s: 600 } ]
+  - id: reviewer
+    name: Reviewer
+    instructions: Check the model against the requirements; send it back with changes or approve it.
+    settings:
+      restrictions:
+        files: { write: ["./reports"] }
+        tools: { allow: [cad-kernel] }
+  - id: lead
+    name: Engineering lead
+    runtime: human
+
+steps:
+  - { id: verify, kind: check, command: "make verify", timeout_s: 900 }
+  - { id: sign-off, kind: human, prompt: "Release this revision?", outcomes: [release, revise] }
+
+channels:
+  - { id: design-chat, medium: direct, protocol: a2a@1.2 }
+  - id: shared
+    medium: filesystem
+    path: ./cad
+    access: { cad: read-write, reviewer: read }
+  - id: lead-desk
+    medium: human
+    reach: { slack: "#cad-review" }
+
+connections:
+  - { from: planner, to: cad, kind: handoff, via: design-chat, carries: [ { message: requirements } ] }
+  - from: cad
+    to: reviewer
+    kind: handoff
+    via: shared
+    carries: [ { artifact: model } ]
+  - { from: reviewer, to: cad, kind: handoff, max_rounds: 3, when: "review.outcome == 'changes'" }
+  - { from: reviewer, to: verify, kind: handoff }
+  - { from: verify, to: sign-off, kind: handoff }
+  - { from: sign-off, to: lead, kind: approve, via: lead-desk }
+  - { from: lead, to: design, kind: watch }
+
+communication:
+  mode: closed
+  deny:
+    - { from: reviewer, to: planner }
+
+policies:
+  on_failure: { strategy: retry, max_attempts: 2, then: escalate }
+  escalation:
+    - { from: cad, after_rounds: 3, to: lead }
+
+layout:
+  units: px
+  nodes:
+    brief: { x: -220, y: 80 }
+    planner: { x: 0, y: 80 }
+    cad: { x: 240, y: 80 }
+    reviewer: { x: 480, y: 80 }
+    verify: { x: 720, y: 80 }
+    sign-off: { x: 960, y: 80 }
+    lead: { x: 960, y: 260 }
+  groups:
+    design: { x: -40, y: 20, w: 480, h: 180 }
+
+extensions:
+  com.usesculptured:
+    decision_log: []

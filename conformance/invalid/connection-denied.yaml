@@ -1,0 +1,5 @@
+madl: draft
+system: { id: s, name: S }
+agents: [ { id: a }, { id: b } ]
+connections: [ { from: a, to: b, kind: handoff } ]
+communication: { deny: [ { between: [b, a] } ] }

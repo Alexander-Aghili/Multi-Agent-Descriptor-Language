@@ -1,0 +1,5 @@
+madl: draft
+system: { id: s, name: S }
+agents: [ { id: a } ]
+steps: [ { id: m, kind: merge, prompt: "?" } ]
+connections: [ { from: a, to: m, kind: handoff } ]

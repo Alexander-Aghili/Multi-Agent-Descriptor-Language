@@ -1,0 +1,31 @@
+# Open communication, with bans: anyone may talk to anyone, except as denied. Tools are limited
+# by an allow list for one group and a ban list for everyone.
+madl: draft
+system: { id: support-desk, name: Support desk }
+defaults:
+  preferences: { runtime: claude-code }
+  restrictions:
+    tools: { deny: ["claude-code:Bash"] }
+communication:
+  mode: open
+  deny:
+    - { between: [billing, triage], kinds: [handoff] }
+    - { from: "*", to: auditor, kinds: [delegate] }
+groups:
+  - id: frontline
+    name: Front line
+    settings:
+      restrictions:
+        tools: { allow: [tickets, kb] }
+agents:
+  - id: triage
+    groups: [frontline]
+    tools: [ { id: tickets, mcp: { url: "https://tickets.example.com/mcp" } }, { id: kb, mcp: { url: "https://kb.example.com/mcp" } } ]
+  - { id: billing, groups: [frontline] }
+  - id: auditor
+    instructions: Read every conversation; report problems.
+    settings:
+      restrictions: { communication: { mode: closed } }
+connections:
+  - { from: auditor, to: frontline, kind: watch }
+  - { from: triage, to: billing, kind: ask, mode: sync }

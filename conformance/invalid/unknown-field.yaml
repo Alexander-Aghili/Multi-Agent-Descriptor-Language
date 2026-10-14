@@ -1,0 +1,3 @@
+madl: draft
+system: { id: s, name: S }
+agents: [ { id: a, instruction: typo } ]

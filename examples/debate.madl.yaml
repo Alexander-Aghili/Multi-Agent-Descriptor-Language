@@ -1,0 +1,12 @@
+# Two agents argue opposite positions for up to three rounds; a judge decides.
+madl: draft
+system: { id: design-debate, name: Design debate }
+defaults:
+  preferences: { runtime: claude-code, model: anthropic/claude-opus-5-5 }
+agents:
+  - { id: for-rust, instructions: Argue for writing the service in Rust. }
+  - { id: for-go, instructions: Argue for writing the service in Go. }
+  - { id: judge, instructions: "Weigh both arguments and decide, with reasons." }
+topology:
+  patterns:
+    - { pattern: debate, members: [for-rust, for-go], judge: judge, max_rounds: 3 }

@@ -1,0 +1,4 @@
+- id: author
+  instructions: { $ref: ./prompts/author.md }
+- id: checker
+  instructions: { $ref: ./prompts/checker.md }

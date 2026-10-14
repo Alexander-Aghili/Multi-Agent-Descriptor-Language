@@ -1,0 +1,14 @@
+# The smallest useful system: three agents in a line.
+madl: draft
+system: { id: blog-pipeline, name: Blog pipeline }
+defaults:
+  preferences: { runtime: claude-code }
+agents:
+  - { id: researcher, instructions: Collect facts on the topic. }
+  - { id: writer, instructions: Write the post from the facts. }
+  - { id: editor, instructions: Tighten the post and fix errors. }
+inputs:
+  - { id: topic, text: "How heat pumps work in cold climates." }
+topology:
+  patterns:
+    - { pattern: pipeline, members: [researcher, writer, editor] }

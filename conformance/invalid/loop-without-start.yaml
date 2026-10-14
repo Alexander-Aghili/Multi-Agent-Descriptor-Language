@@ -1,0 +1,5 @@
+madl: draft
+system: { id: s, name: S }
+agents: [ { id: start }, { id: a }, { id: b } ]
+connections: [ { from: a, to: b, kind: handoff }, { from: b, to: a, kind: handoff } ]
+inputs: [ { id: i, text: t, to: [start] } ]

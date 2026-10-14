@@ -1,0 +1,7 @@
+# A document split across files: agents in their own file, instructions in Markdown.
+madl: draft
+system: { id: split-team, name: Split team }
+defaults: { $ref: ./defaults.yaml }
+agents: { $ref: ./agents.yaml }
+connections:
+  - { from: author, to: checker, kind: review, max_rounds: 2 }

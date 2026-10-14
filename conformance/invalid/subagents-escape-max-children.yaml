@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+defaults: { restrictions: { spawn: { max_children: 2 } } }
+agents: [ { id: a, subagents: { settings: { restrictions: { spawn: { max_children: 9 } } } } } ]

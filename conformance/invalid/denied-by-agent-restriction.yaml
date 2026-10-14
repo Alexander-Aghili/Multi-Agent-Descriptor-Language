@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+agents: [ { id: a, settings: { restrictions: { communication: { deny: [ { from: a, to: b } ] } } } }, { id: b } ]
+connections: [ { from: a, to: b, kind: report } ]

@@ -1,0 +1,17 @@
+# Allow lists intersect, ban lists add up, and an allowed tool that is banned stays banned.
+madl: draft
+system: { id: tools, name: Tools }
+defaults:
+  restrictions:
+    tools: { allow: [fs, search, shell], deny: [shell] }
+    communication: { mode: open, deny: [ { from: a, to: b } ] }
+communication:
+  mode: closed
+agents:
+  - id: a
+    settings:
+      restrictions:
+        tools: { allow: [fs, search], deny: [search] }
+        communication: { deny: [ { between: [a, c] } ] }
+  - { id: b }
+  - { id: c }

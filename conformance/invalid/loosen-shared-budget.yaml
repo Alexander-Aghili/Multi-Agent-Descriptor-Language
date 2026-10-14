@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+defaults: { restrictions: { budget: { scope: shared } } }
+agents: [ { id: a, settings: { restrictions: { budget: { scope: own } } } } ]

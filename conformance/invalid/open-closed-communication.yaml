@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+communication: { mode: closed }
+agents: [ { id: a, settings: { restrictions: { communication: { mode: open } } } } ]

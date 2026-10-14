@@ -1,0 +1,21 @@
+[package]
+name = "madl-cli"
+description = "The madl command: validate, resolve, expand and draw MADL documents"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "madl"
+path = "src/main.rs"
+
+[dependencies]
+madl.workspace = true
+serde_json.workspace = true
+serde_yaml_ng.workspace = true
+clap.workspace = true
+
+[lints]
+workspace = true

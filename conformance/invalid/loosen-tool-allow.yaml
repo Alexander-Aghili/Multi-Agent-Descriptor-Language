@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+defaults: { restrictions: { tools: { allow: [fs] } } }
+agents: [ { id: a, settings: { restrictions: { tools: { allow: [fs, shell] } } } } ]

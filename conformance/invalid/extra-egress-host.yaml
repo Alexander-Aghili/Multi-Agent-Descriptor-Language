@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+defaults: { restrictions: { network: { egress: [pypi.org] } } }
+agents: [ { id: a, settings: { restrictions: { network: { egress: [pypi.org, evil.example] } } } } ]

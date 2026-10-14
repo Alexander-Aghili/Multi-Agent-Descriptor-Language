@@ -1,0 +1,23 @@
+# Fan-out: one writer per chapter, each in its own copy; fan-in once all are done; merge.
+madl: draft
+system: { id: textbook, name: Textbook creator }
+defaults:
+  preferences: { runtime: claude-code }
+inputs:
+  - id: outline
+    text: "Chapters: forces, energy, momentum."
+    to: [planner]
+agents:
+  - { id: planner, instructions: "Turn the outline into a list of chapters, one item each." }
+  - { id: chapter-writer, instructions: Write one chapter with worked examples., workspace: { copy: per-item } }
+  - { id: editor, instructions: Make the chapters consistent in tone and notation. }
+steps:
+  - { id: each-chapter, kind: fan-out, over: planner.chapters, copies: per-item }
+  - { id: all-chapters, kind: fan-in, join: all }
+  - { id: publish, kind: merge, into: main }
+connections:
+  - { from: planner, to: each-chapter, kind: handoff }
+  - { from: each-chapter, to: chapter-writer, kind: handoff }
+  - { from: chapter-writer, to: all-chapters, kind: handoff }
+  - { from: all-chapters, to: editor, kind: handoff }
+  - { from: editor, to: publish, kind: handoff }

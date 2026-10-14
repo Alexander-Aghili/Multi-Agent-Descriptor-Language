@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+agents: [ { id: a } ]
+connections: [ { from: a, to: a, kind: ask } ]

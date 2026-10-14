@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+defaults: { restrictions: { budget: { wall_clock: 1h } } }
+agents: [ { id: a, settings: { restrictions: { budget: { wall_clock: 90m } } } } ]

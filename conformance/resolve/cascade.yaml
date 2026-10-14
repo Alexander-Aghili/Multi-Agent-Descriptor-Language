@@ -1,0 +1,26 @@
+# Root → group → agent: preferences override, restrictions tighten, options merge by key.
+madl: draft
+system: { id: cascade, name: Cascade }
+defaults:
+  preferences:
+    runtime: claude-code
+    model: anthropic/claude-sonnet-5-5
+    options: { effort: medium, sandbox: { network: false } }
+  restrictions:
+    budget: { tokens: 1000000, wall_clock: 2h }
+    tools: { deny: [web-fetch] }
+groups:
+  - id: outer
+    settings:
+      preferences: { model: anthropic/claude-opus-5-5 }
+      restrictions: { budget: { tokens: 500000 } }
+  - id: inner
+    parent: outer
+    settings:
+      preferences: { options: { sandbox: { network: true } } }
+      restrictions: { tools: { deny: [shell] } }
+agents:
+  - id: a
+    groups: [inner]
+    runtime: codex
+  - id: b

@@ -1,0 +1,117 @@
+{
+  "agents": [
+    {
+      "id": "a",
+      "preferences": {
+        "runtime": "codex",
+        "model": "anthropic/claude-opus-5-5",
+        "options": {
+          "effort": "medium",
+          "sandbox": {
+            "network": true
+          }
+        }
+      },
+      "restrictions": {
+        "tools": {
+          "deny": [
+            "web-fetch",
+            "shell"
+          ]
+        },
+        "budget": {
+          "tokens": 500000,
+          "wall_clock": "2h"
+        }
+      },
+      "sources": {
+        "preferences.model": "/groups/0/settings/preferences/model",
+        "preferences.options.effort": "/defaults/preferences/options/effort",
+        "preferences.options.sandbox": "/defaults/preferences/options/sandbox",
+        "preferences.options.sandbox.network": "/groups/1/settings/preferences/options/sandbox/network",
+        "preferences.runtime": "/agents/0/runtime",
+        "restrictions.budget.tokens": "/groups/0/settings/restrictions/budget/tokens",
+        "restrictions.budget.wall_clock": "/defaults/restrictions/budget/wall_clock",
+        "restrictions.tools.deny": "/groups/1/settings/restrictions/tools/deny"
+      },
+      "subagents": {
+        "preferences": {
+          "runtime": "codex"
+        },
+        "restrictions": {
+          "tools": {
+            "deny": [
+              "web-fetch",
+              "shell"
+            ]
+          },
+          "budget": {
+            "tokens": 500000,
+            "wall_clock": "2h"
+          }
+        },
+        "sources": {
+          "preferences.runtime": "/agents/0/runtime",
+          "restrictions.budget.tokens": "/groups/0/settings/restrictions/budget/tokens",
+          "restrictions.budget.wall_clock": "/defaults/restrictions/budget/wall_clock",
+          "restrictions.tools.deny": "/groups/1/settings/restrictions/tools/deny"
+        }
+      }
+    },
+    {
+      "id": "b",
+      "preferences": {
+        "runtime": "claude-code",
+        "model": "anthropic/claude-sonnet-5-5",
+        "options": {
+          "effort": "medium",
+          "sandbox": {
+            "network": false
+          }
+        }
+      },
+      "restrictions": {
+        "tools": {
+          "deny": [
+            "web-fetch"
+          ]
+        },
+        "budget": {
+          "tokens": 1000000,
+          "wall_clock": "2h"
+        }
+      },
+      "sources": {
+        "preferences.model": "/defaults/preferences/model",
+        "preferences.options.effort": "/defaults/preferences/options/effort",
+        "preferences.options.sandbox": "/defaults/preferences/options/sandbox",
+        "preferences.runtime": "/defaults/preferences/runtime",
+        "restrictions.budget.tokens": "/defaults/restrictions/budget/tokens",
+        "restrictions.budget.wall_clock": "/defaults/restrictions/budget/wall_clock",
+        "restrictions.tools.deny": "/defaults/restrictions/tools/deny"
+      },
+      "subagents": {
+        "preferences": {
+          "runtime": "claude-code"
+        },
+        "restrictions": {
+          "tools": {
+            "deny": [
+              "web-fetch"
+            ]
+          },
+          "budget": {
+            "tokens": 1000000,
+            "wall_clock": "2h"
+          }
+        },
+        "sources": {
+          "preferences.runtime": "/defaults/preferences/runtime",
+          "restrictions.budget.tokens": "/defaults/restrictions/budget/tokens",
+          "restrictions.budget.wall_clock": "/defaults/restrictions/budget/wall_clock",
+          "restrictions.tools.deny": "/defaults/restrictions/tools/deny"
+        }
+      }
+    }
+  ]
+}

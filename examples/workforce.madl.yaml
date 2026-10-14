@@ -1,0 +1,43 @@
+# A coordinator assigns subtasks to workers at run time (like a CAMEL Workforce). Workers share
+# memory; failed work is split into smaller pieces; spawned helpers get a cheaper model.
+madl: draft
+system:
+  id: research-workforce
+  name: Research workforce
+inputs:
+  - id: question
+    text: Summarise this year's work on multi-agent topologies, with sources.
+groups:
+  - id: workforce
+    name: Workforce
+    purpose: Answer the question with a sourced report.
+agents:
+  - id: coordinator
+    instructions: Split the question into subtasks and give each to the best worker.
+    groups: [workforce]
+    subagents:
+      template:
+        instructions: You are a focused helper for one subtask.
+        model: anthropic/claude-haiku-5-5
+      settings:
+        restrictions: { tools: { allow: [search] } }
+  - id: searcher
+    instructions: Find and read sources.
+    groups: [workforce]
+    tools: [ { id: search, builtin: "camel:SearchToolkit" } ]
+  - id: writer
+    instructions: Write the report from the findings.
+    groups: [workforce]
+defaults:
+  preferences: { runtime: camel, model: anthropic/claude-sonnet-5-5 }
+  restrictions: { spawn: { max_children: 4, max_depth: 2 } }
+channels:
+  - { id: memory, medium: shared-memory, access: { searcher: read-write, writer: read-write } }
+topology:
+  patterns:
+    - { id: assign, pattern: supervisor, supervisor: coordinator, members: [searcher, writer], routing: dynamic }
+policies:
+  on_failure: { strategy: decompose, max_attempts: 2, then: stop }
+extensions:
+  ai.camel:
+    workforce: { share_memory: true }

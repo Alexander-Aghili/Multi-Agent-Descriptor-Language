@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+groups: [ { id: g1, parent: g2 }, { id: g2, parent: g1 } ]
+agents: [ { id: a } ]

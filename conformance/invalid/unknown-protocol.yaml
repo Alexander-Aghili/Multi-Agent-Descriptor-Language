@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+defaults: { preferences: { protocol: "a2a@" } }
+agents: [ { id: a } ]

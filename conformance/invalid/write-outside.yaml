@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+defaults: { restrictions: { files: { write: [./out] } } }
+agents: [ { id: a, settings: { restrictions: { files: { write: [./out, ./src] } } } } ]

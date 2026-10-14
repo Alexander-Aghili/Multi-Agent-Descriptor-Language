@@ -1,0 +1,22 @@
+# How far settings reach: `self` stays with the agent, `descendants` reaches what it spawns,
+# `subagents` reaches only what it spawns. Spawned agents are one level further down.
+madl: draft
+system: { id: reach, name: Reach }
+defaults:
+  restrictions:
+    spawn: { max_depth: 2 }
+agents:
+  - id: lead
+    settings:
+      preferences: { model: anthropic/claude-opus-5-5 }
+      restrictions: { budget: { tokens: 900 } }
+      applies_to: { restrictions: self }
+    subagents:
+      template: { model: anthropic/claude-haiku-5-5 }
+      settings:
+        restrictions: { tools: { allow: [fs] } }
+  - id: worker
+    settings:
+      preferences: { language: fr }
+      restrictions: { files: { write: [./out] } }
+      applies_to: { preferences: descendants }

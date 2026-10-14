@@ -1,0 +1,6 @@
+madl: draft
+system: { id: s, name: S }
+groups: [ { id: g } ]
+agents: [ { id: a }, { id: b, groups: [g] } ]
+connections: [ { from: a, to: b, kind: ask } ]
+communication: { deny: [ { from: a, to: g, kinds: [ask] } ] }

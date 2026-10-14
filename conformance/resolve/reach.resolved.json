@@ -1,0 +1,84 @@
+{
+  "agents": [
+    {
+      "id": "lead",
+      "preferences": {
+        "model": "anthropic/claude-opus-5-5"
+      },
+      "restrictions": {
+        "budget": {
+          "tokens": 900
+        },
+        "spawn": {
+          "max_depth": 2
+        }
+      },
+      "sources": {
+        "preferences.model": "/agents/0/settings/preferences/model",
+        "restrictions.budget.tokens": "/agents/0/settings/restrictions/budget/tokens",
+        "restrictions.spawn.max_depth": "/defaults/restrictions/spawn/max_depth"
+      },
+      "subagents": {
+        "preferences": {
+          "model": "anthropic/claude-haiku-5-5"
+        },
+        "restrictions": {
+          "tools": {
+            "allow": [
+              "fs"
+            ]
+          },
+          "spawn": {
+            "max_depth": 1
+          }
+        },
+        "sources": {
+          "preferences.model": "/agents/0/subagents/template/model",
+          "restrictions.spawn.max_depth": "/defaults/restrictions/spawn/max_depth",
+          "restrictions.tools.allow": "/agents/0/subagents/settings/restrictions/tools/allow"
+        }
+      }
+    },
+    {
+      "id": "worker",
+      "preferences": {
+        "language": "fr"
+      },
+      "restrictions": {
+        "files": {
+          "write": [
+            "./out"
+          ]
+        },
+        "spawn": {
+          "max_depth": 2
+        }
+      },
+      "sources": {
+        "preferences.language": "/agents/1/settings/preferences/language",
+        "restrictions.files.write": "/agents/1/settings/restrictions/files/write",
+        "restrictions.spawn.max_depth": "/defaults/restrictions/spawn/max_depth"
+      },
+      "subagents": {
+        "preferences": {
+          "language": "fr"
+        },
+        "restrictions": {
+          "files": {
+            "write": [
+              "./out"
+            ]
+          },
+          "spawn": {
+            "max_depth": 1
+          }
+        },
+        "sources": {
+          "preferences.language": "/agents/1/settings/preferences/language",
+          "restrictions.files.write": "/agents/1/settings/restrictions/files/write",
+          "restrictions.spawn.max_depth": "/defaults/restrictions/spawn/max_depth"
+        }
+      }
+    }
+  ]
+}

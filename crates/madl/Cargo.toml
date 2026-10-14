@@ -1,0 +1,20 @@
+[package]
+name = "madl"
+description = "Reader, validator and resolver for the Multi-Agent Descriptor Language"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml_ng.workspace = true
+serde_path_to_error.workspace = true
+schemars.workspace = true
+ts-rs.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

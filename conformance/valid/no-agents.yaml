@@ -1,0 +1,3 @@
+# No settings at all is valid: MADL sets no limits the author did not set.
+madl: draft
+system: { id: empty, name: Empty }

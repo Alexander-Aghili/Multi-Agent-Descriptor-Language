@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+defaults: { restrictions: { spawn: { allowed: false } } }
+agents: [ { id: a, subagents: { settings: { restrictions: { spawn: { allowed: true } } } } } ]

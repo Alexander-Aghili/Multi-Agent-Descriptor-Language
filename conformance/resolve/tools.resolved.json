@@ -1,0 +1,199 @@
+{
+  "agents": [
+    {
+      "id": "a",
+      "preferences": {},
+      "restrictions": {
+        "tools": {
+          "allow": [
+            "fs",
+            "search"
+          ],
+          "deny": [
+            "shell",
+            "search"
+          ]
+        },
+        "communication": {
+          "mode": "closed",
+          "deny": [
+            {
+              "from": "a",
+              "to": "b"
+            },
+            {
+              "between": [
+                "a",
+                "c"
+              ]
+            }
+          ]
+        }
+      },
+      "sources": {
+        "restrictions.communication.deny": "/agents/0/settings/restrictions/communication/deny",
+        "restrictions.communication.mode": "/communication/mode",
+        "restrictions.tools.allow": "/agents/0/settings/restrictions/tools/allow",
+        "restrictions.tools.deny": "/agents/0/settings/restrictions/tools/deny"
+      },
+      "subagents": {
+        "preferences": {},
+        "restrictions": {
+          "tools": {
+            "allow": [
+              "fs",
+              "search"
+            ],
+            "deny": [
+              "shell",
+              "search"
+            ]
+          },
+          "communication": {
+            "mode": "closed",
+            "deny": [
+              {
+                "from": "a",
+                "to": "b"
+              },
+              {
+                "between": [
+                  "a",
+                  "c"
+                ]
+              }
+            ]
+          }
+        },
+        "sources": {
+          "restrictions.communication.deny": "/agents/0/settings/restrictions/communication/deny",
+          "restrictions.communication.mode": "/communication/mode",
+          "restrictions.tools.allow": "/agents/0/settings/restrictions/tools/allow",
+          "restrictions.tools.deny": "/agents/0/settings/restrictions/tools/deny"
+        }
+      }
+    },
+    {
+      "id": "b",
+      "preferences": {},
+      "restrictions": {
+        "tools": {
+          "allow": [
+            "fs",
+            "search",
+            "shell"
+          ],
+          "deny": [
+            "shell"
+          ]
+        },
+        "communication": {
+          "mode": "closed",
+          "deny": [
+            {
+              "from": "a",
+              "to": "b"
+            }
+          ]
+        }
+      },
+      "sources": {
+        "restrictions.communication.deny": "/defaults/restrictions/communication/deny",
+        "restrictions.communication.mode": "/communication/mode",
+        "restrictions.tools.allow": "/defaults/restrictions/tools/allow",
+        "restrictions.tools.deny": "/defaults/restrictions/tools/deny"
+      },
+      "subagents": {
+        "preferences": {},
+        "restrictions": {
+          "tools": {
+            "allow": [
+              "fs",
+              "search",
+              "shell"
+            ],
+            "deny": [
+              "shell"
+            ]
+          },
+          "communication": {
+            "mode": "closed",
+            "deny": [
+              {
+                "from": "a",
+                "to": "b"
+              }
+            ]
+          }
+        },
+        "sources": {
+          "restrictions.communication.deny": "/defaults/restrictions/communication/deny",
+          "restrictions.communication.mode": "/communication/mode",
+          "restrictions.tools.allow": "/defaults/restrictions/tools/allow",
+          "restrictions.tools.deny": "/defaults/restrictions/tools/deny"
+        }
+      }
+    },
+    {
+      "id": "c",
+      "preferences": {},
+      "restrictions": {
+        "tools": {
+          "allow": [
+            "fs",
+            "search",
+            "shell"
+          ],
+          "deny": [
+            "shell"
+          ]
+        },
+        "communication": {
+          "mode": "closed",
+          "deny": [
+            {
+              "from": "a",
+              "to": "b"
+            }
+          ]
+        }
+      },
+      "sources": {
+        "restrictions.communication.deny": "/defaults/restrictions/communication/deny",
+        "restrictions.communication.mode": "/communication/mode",
+        "restrictions.tools.allow": "/defaults/restrictions/tools/allow",
+        "restrictions.tools.deny": "/defaults/restrictions/tools/deny"
+      },
+      "subagents": {
+        "preferences": {},
+        "restrictions": {
+          "tools": {
+            "allow": [
+              "fs",
+              "search",
+              "shell"
+            ],
+            "deny": [
+              "shell"
+            ]
+          },
+          "communication": {
+            "mode": "closed",
+            "deny": [
+              {
+                "from": "a",
+                "to": "b"
+              }
+            ]
+          }
+        },
+        "sources": {
+          "restrictions.communication.deny": "/defaults/restrictions/communication/deny",
+          "restrictions.communication.mode": "/communication/mode",
+          "restrictions.tools.allow": "/defaults/restrictions/tools/allow",
+          "restrictions.tools.deny": "/defaults/restrictions/tools/deny"
+        }
+      }
+    }
+  ]
+}
