@@ -583,3 +583,28 @@ meps/                  MADL Enhancement Proposals: 0001-core.md is this design o
 3. Sculptured: team/v1 ↔ MADL converter, then Sculptured reads and writes MADL natively.
 4. Docs site, then the first dated revision.
 5. Later: Python and TypeScript packages, the CAMEL adapter.
+
+## 18. Changes made while building the reference implementation
+
+The [spec text](../../spec/draft/index.md) governs where it differs from this design. These were
+settled while implementing it:
+
+1. **Plain ids everywhere.** Ids are unique across the whole document, so bans and connections name
+   groups by id (`design`, not `group:design`); `*` in a ban means anyone.
+2. **Inputs connect only through `inputs[].to`.** An input id in a connection is an error.
+3. **Shorthand.** `runtime`, `model` and `resume` on an agent are shorthand for its preferences;
+   setting both is an error.
+4. **Preferences** are `runtime`, `model`, `protocol`, `resume`, `language`, `questions` and
+   `options`. `instructions_append` was dropped: appending would contradict "the nearest value
+   wins".
+5. **Tools** use `allow` and `deny` lists with no `mode`: `allow` absent means every tool given.
+6. **A channel's people** are reached through `reach` (`{ slack: "#…" }`), so `via` only ever
+   names a channel.
+7. **Layout** keeps agents, steps and inputs in one `nodes` map.
+8. **Steps** are one object with `kind`; which fields each kind needs is a validation rule.
+9. **Subagents run on their parent's runtime** unless the template or settings name another, and
+   are one `max_depth` level further down.
+10. **Patterns** mark the connections they produce with `pattern: <id>`; a connection the author
+    already declared is kept, not repeated.
+11. **The reference implementation does not enable `serde_json`'s `preserve_order`**, so a host
+    that depends on it keeps its own JSON key order.
