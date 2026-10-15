@@ -51,7 +51,7 @@ Durations are written `90s`, `30m`, `2h`, `1d` or combined, as in `1h30m` (`bad-
 | `tools.deny` | Never these tools | union | (cannot happen) |
 | `files.read`, `files.write` | Paths (and everything under them) the agent may read or write | intersection of path sets | a path outside every outer path |
 | `network.egress` | `deny`, a list of hosts, or `allow` (ordered tightest first) | the tighter; host lists intersect | a looser rule, or a host an outer list lacks |
-| `budget.tokens`, `cost_usd`, `wall_clock` | Limits | minimum | a larger value |
+| `budget.tokens`, `cost_usd`, `wall_clock`, `turns`, `working_time` | [Limits](#limits) | minimum (hard and soft values each) | a larger hard value |
 | `budget.scope` | `shared`: the agent and what it spawns draw from one budget; `own`: each has its own | `shared` wins | `own` under `shared` |
 | `spawn.allowed` | Whether the agent may start subagents | AND | `true` under `false` |
 | `spawn.max_children`, `max_depth` | How many, and how many levels below the agent | minimum | a larger value |
@@ -61,6 +61,14 @@ Durations are written `90s`, `30m`, `2h`, `1d` or combined, as in `1h30m` (`bad-
 Tools are named by tool id (`fs`), `<tool id>/<tool name>` for one MCP tool, or
 `<runtime>:<name>` for a runtime's own tool. Effective allowed tools are the allow list minus the
 deny list.
+
+### Limits
+
+A limit is a number or duration (its hard value) or `{ soft, hard }`. At the soft value a runtime
+SHOULD start no new work for the agent and ask it to finish with a summary; at the hard value it MUST
+stop the agent and what it started. Without `soft` a runtime may choose one. `soft` above `hard` is
+`budget-soft-above-hard`. `turns` counts the agent's turns in one run; `working_time` is time spent
+in turns. A budget for the whole run is [`system.budget`](document.md#run-budget).
 
 A block that tries to loosen an inherited restriction is an error (`restriction-loosened`), reported
 at the block's value. Resolution keeps the tighter value regardless. A runner meeting a loosening

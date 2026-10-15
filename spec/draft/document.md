@@ -11,7 +11,7 @@ Top-level members:
 | Member | Required | |
 |---|---|---|
 | `madl` | yes | The revision the document is written for: `draft`, or a dated revision such as `2027-01-15` |
-| `system` | yes | `id`, `name`, optional `description` |
+| `system` | yes | `id`, `name`, optional `description` and [`budget`](#run-budget) |
 | `defaults` | no | The global [settings block](settings.md) |
 | `inputs` | no | What the system is given when it starts |
 | `groups` | no | Groups |
@@ -77,6 +77,31 @@ inputs:
 An input's `to` lists agents, groups or steps; empty means the [starting agents](topology.md#starting-points).
 An agent an input names receives the input after its own instructions when the system starts; an
 agent further along receives it with its first handoff.
+
+## Run budget
+
+`system.budget` is what one run of the whole system may use, every agent and everything they spawn
+together ([MEP 0002](../../meps/0002-soft-and-hard-budgets.md)). Each limit is a number or duration,
+or `{ soft, hard }` as in [settings](settings.md#limits).
+
+```yaml
+system:
+  id: c172
+  name: C172 model
+  budget:
+    plan: [ { provider: claude, window: five_hour, soft: 25, hard: 30 } ]
+    tokens: { hard: 50000000 }
+    wall_clock: { soft: 45m, hard: 1h }
+    max_working: 6
+```
+
+| Member | Meaning |
+|---|---|
+| `plan` | Shares of a provider's plan window in percent, above 0 and at most 100 (`budget-percent-out-of-range`). The run's share is the window's change since the run started, so use outside the run counts too. |
+| `tokens`, `cost_usd`, `wall_clock` | Limits for the run |
+| `max_working` | Most agents working at the same time; the rest wait for a free slot; at least 1 (`budget-no-room`) |
+
+A run budget and the agents' own budgets all apply; whichever is reached first acts.
 
 ## Groups
 

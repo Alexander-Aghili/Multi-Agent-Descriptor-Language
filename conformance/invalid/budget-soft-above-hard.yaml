@@ -1,0 +1,6 @@
+madl: draft
+system:
+  id: s
+  name: S
+  budget: { tokens: { soft: 2000, hard: 1000 } }
+agents: [ { id: a, settings: { restrictions: { budget: { working_time: { soft: 2h, hard: 1h } } } } } ]

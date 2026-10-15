@@ -1,0 +1,6 @@
+madl: draft
+system:
+  id: s
+  name: S
+  budget: { max_working: 0 }
+agents: [ { id: a } ]

@@ -1,0 +1,24 @@
+# MEP-0002: a whole run's budget on `system`, and an agent's own soft and hard limits.
+madl: draft
+system:
+  id: c172
+  name: C172 model
+  budget:
+    plan:
+      - { provider: claude, window: five_hour, soft: 25, hard: 30 }
+      - { provider: codex, window: five_hour, hard: 10 }
+    tokens: { soft: 40000000, hard: 50000000 }
+    wall_clock: { soft: 45m, hard: 1h }
+    max_working: 6
+defaults:
+  restrictions:
+    budget: { tokens: 20000000 }
+agents:
+  - id: parser
+    settings:
+      restrictions:
+        budget:
+          tokens: { soft: 1000000, hard: 2000000 }
+          turns: { hard: 40 }
+          working_time: { soft: 20m, hard: 30m }
+          scope: shared

@@ -216,16 +216,25 @@ pub enum EgressRule {
 #[serde(deny_unknown_fields)]
 #[ts(export)]
 pub struct Budget {
+    /// Tokens of every kind. A bare number is the hard value; `{ soft, hard }` adds a soft one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    #[ts(optional)]
-    pub tokens: Option<u64>,
+    #[ts(optional, type = "super::Limit<number>")]
+    pub tokens: Option<super::Limit<u64>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub cost_usd: Option<f64>,
     /// A duration such as `90s`, `30m`, `2h` or `1h30m`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
-    pub wall_clock: Option<String>,
+    pub wall_clock: Option<super::Limit<String>>,
+    /// Turns (model replies to a message) in one run (MEP-0002).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional, type = "super::Limit<number>")]
+    pub turns: Option<super::Limit<u64>>,
+    /// Time spent working (in turns), as a duration (MEP-0002).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub working_time: Option<super::Limit<String>>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub scope: Option<BudgetScope>,

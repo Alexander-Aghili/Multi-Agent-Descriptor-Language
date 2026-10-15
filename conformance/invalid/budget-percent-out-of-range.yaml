@@ -1,0 +1,6 @@
+madl: draft
+system:
+  id: s
+  name: S
+  budget: { plan: [ { provider: claude, window: five_hour, hard: 130 } ] }
+agents: [ { id: a } ]

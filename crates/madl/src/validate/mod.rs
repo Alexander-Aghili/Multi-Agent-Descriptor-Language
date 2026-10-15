@@ -1,6 +1,7 @@
 //! `validate`: everything a Reader must check beyond the schema (spec §11).
 mod flow;
 mod index;
+mod limits;
 mod names;
 mod refs;
 mod shape;
@@ -17,6 +18,9 @@ pub fn validate(doc: &Document) -> Report {
     let index = index::Index::build(doc);
     refs::check(doc, &index, &mut report);
     names::check(doc, &mut report);
+    if let Some(b) = &doc.system.budget {
+        limits::run_budget(b, "/system/budget", &mut report);
+    }
     shape::check(doc, &mut report);
     if !report.is_ok() {
         return report;

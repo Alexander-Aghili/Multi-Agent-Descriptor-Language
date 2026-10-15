@@ -334,18 +334,47 @@
           ]
         },
         "tokens": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "format": "uint64",
-          "minimum": 0
+          "description": "Tokens of every kind. A bare number is the hard value; `{ soft, hard }` adds a soft one.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Limit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "turns": {
+          "description": "Turns (model replies to a message) in one run (MEP-0002).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Limit"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "wall_clock": {
           "description": "A duration such as `90s`, `30m`, `2h` or `1h30m`.",
-          "type": [
-            "string",
-            "null"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Limit3"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "working_time": {
+          "description": "Time spent working (in turns), as a duration (MEP-0002).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Limit3"
+            },
+            {
+              "type": "null"
+            }
           ]
         }
       },
@@ -979,6 +1008,42 @@
       },
       "additionalProperties": false
     },
+    "Limit": {
+      "description": "A limit: a bare value is its hard value; `{ soft, hard }` adds a soft value at or below it.\nWithout a soft value, a runtime may choose one (for example 85% of hard).",
+      "anyOf": [
+        {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        {
+          "$ref": "#/$defs/SoftHard"
+        }
+      ]
+    },
+    "Limit2": {
+      "description": "A limit: a bare value is its hard value; `{ soft, hard }` adds a soft value at or below it.\nWithout a soft value, a runtime may choose one (for example 85% of hard).",
+      "anyOf": [
+        {
+          "type": "number",
+          "format": "double"
+        },
+        {
+          "$ref": "#/$defs/SoftHard2"
+        }
+      ]
+    },
+    "Limit3": {
+      "description": "A limit: a bare value is its hard value; `{ soft, hard }` adds a soft value at or below it.\nWithout a soft value, a runtime may choose one (for example 85% of hard).",
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/SoftHard3"
+        }
+      ]
+    },
     "Loops": {
       "type": "object",
       "properties": {
@@ -1261,6 +1326,38 @@
         "machine"
       ]
     },
+    "PlanShare": {
+      "description": "A share of one plan window (such as a subscription's 5-hour window) that a run may add.",
+      "type": "object",
+      "properties": {
+        "hard": {
+          "type": "number",
+          "format": "double"
+        },
+        "provider": {
+          "description": "The plan's provider, e.g. `claude` or `codex`.",
+          "type": "string"
+        },
+        "soft": {
+          "description": "Percent of the window, above 0 and at most 100.",
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "window": {
+          "description": "The window, e.g. `five_hour` or `seven_day`.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "window",
+        "hard"
+      ]
+    },
     "Point": {
       "type": "object",
       "properties": {
@@ -1540,6 +1637,59 @@
         "static"
       ]
     },
+    "RunBudget": {
+      "description": "What one run of the whole system may use, every agent and everything they spawn together.",
+      "type": "object",
+      "properties": {
+        "cost_usd": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Limit2"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "max_working": {
+          "description": "Most agents working at the same time; the rest wait for a free slot.",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint32",
+          "minimum": 0
+        },
+        "plan": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PlanShare"
+          }
+        },
+        "tokens": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Limit"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "wall_clock": {
+          "description": "A duration such as `90s`, `30m`, `2h` or `1h30m`, from the run's start.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Limit3"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
     "Schedule": {
       "type": "object",
       "properties": {
@@ -1614,6 +1764,69 @@
         }
       },
       "additionalProperties": false
+    },
+    "SoftHard": {
+      "description": "A limit's soft value (no new work; wrap up) and hard value (stop at once).",
+      "type": "object",
+      "properties": {
+        "hard": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0
+        },
+        "soft": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "uint64",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "hard"
+      ]
+    },
+    "SoftHard2": {
+      "description": "A limit's soft value (no new work; wrap up) and hard value (stop at once).",
+      "type": "object",
+      "properties": {
+        "hard": {
+          "type": "number",
+          "format": "double"
+        },
+        "soft": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "hard"
+      ]
+    },
+    "SoftHard3": {
+      "description": "A limit's soft value (no new work; wrap up) and hard value (stop at once).",
+      "type": "object",
+      "properties": {
+        "hard": {
+          "type": "string"
+        },
+        "soft": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "hard"
+      ]
     },
     "Spawn": {
       "type": "object",
@@ -1820,6 +2033,17 @@
       "description": "What the system is.",
       "type": "object",
       "properties": {
+        "budget": {
+          "description": "What one run of the whole system may use (MEP-0002).",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunBudget"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "description": {
           "type": [
             "string",

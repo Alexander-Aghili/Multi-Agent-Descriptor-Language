@@ -1,0 +1,4 @@
+madl: draft
+system: { id: s, name: S }
+defaults: { restrictions: { budget: { turns: 10 } } }
+agents: [ { id: a, settings: { restrictions: { budget: { turns: { soft: 5, hard: 20 } } } } } ]

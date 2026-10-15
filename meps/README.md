@@ -7,3 +7,4 @@ A MEP proposes a change to what a MADL document can say or means. The process is
 | MEP | Title | Status |
 |---|---|---|
 | [0001](../docs/design/2026-10-14-madl-core-design.md) | MADL core (the first draft) | Accepted as `draft` |
+| [0002](0002-soft-and-hard-budgets.md) | Soft and hard limits, and a budget for the whole run | Accepted into `draft` |

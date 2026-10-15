@@ -4,6 +4,11 @@
 
 The first public draft.
 
+- MEP 0002: limits take `{ soft, hard }` (wrap up, then stop); per-agent budgets gain `turns` and
+  `working_time`; `system.budget` sets a budget for the whole run (plan-window shares, tokens, cost,
+  wall clock, most agents working at once). New codes `budget-soft-above-hard`,
+  `budget-percent-out-of-range`, `budget-no-room`.
+
 - Document: system, defaults, inputs, groups (nesting), agents, steps, channels, connections,
   communication, topology, policies, layout, extensions; `$ref` across files.
 - Settings: preferences override, restrictions only tighten; `applies_to` reach (`self`,

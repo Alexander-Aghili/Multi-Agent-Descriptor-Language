@@ -1,0 +1,43 @@
+{
+  "agents": [
+    {
+      "id": "a",
+      "preferences": {},
+      "restrictions": {
+        "budget": {
+          "tokens": {
+            "hard": 900000,
+            "soft": 600000
+          },
+          "turns": {
+            "hard": 30,
+            "soft": 20
+          }
+        }
+      },
+      "sources": {
+        "restrictions.budget.tokens": "/agents/0/settings/restrictions/budget/tokens",
+        "restrictions.budget.turns": "/agents/0/settings/restrictions/budget/turns"
+      },
+      "subagents": {
+        "preferences": {},
+        "restrictions": {
+          "budget": {
+            "tokens": {
+              "hard": 900000,
+              "soft": 600000
+            },
+            "turns": {
+              "hard": 30,
+              "soft": 20
+            }
+          }
+        },
+        "sources": {
+          "restrictions.budget.tokens": "/agents/0/settings/restrictions/budget/tokens",
+          "restrictions.budget.turns": "/agents/0/settings/restrictions/budget/turns"
+        }
+      }
+    }
+  ]
+}

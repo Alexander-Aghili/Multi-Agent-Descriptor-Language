@@ -67,6 +67,10 @@ pub struct System {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub description: Option<String>,
+    /// What one run of the whole system may use (MEP-0002).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub budget: Option<super::RunBudget>,
 }
 
 /// Something the system is given when it starts: a goal, links, notes.

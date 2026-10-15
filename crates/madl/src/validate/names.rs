@@ -103,8 +103,9 @@ fn settings(s: &Settings, at: &str, report: &mut Report) {
         let timeout = p.questions.as_ref().and_then(|q| q.timeout.as_deref());
         duration_of(timeout, &format!("{at}/preferences/questions/timeout"), report);
     }
-    let clock = s.restrictions.as_ref().and_then(|r| r.budget.as_ref()).and_then(|b| b.wall_clock.as_deref());
-    duration_of(clock, &format!("{at}/restrictions/budget/wall_clock"), report);
+    if let Some(b) = s.restrictions.as_ref().and_then(|r| r.budget.as_ref()) {
+        super::limits::budget(b, &format!("{at}/restrictions/budget"), report);
+    }
 }
 
 fn protocol(text: Option<&str>, at: &str, report: &mut Report) {
@@ -117,7 +118,7 @@ fn protocol(text: Option<&str>, at: &str, report: &mut Report) {
     }
 }
 
-fn duration_of(text: Option<&str>, at: &str, report: &mut Report) {
+pub(super) fn duration_of(text: Option<&str>, at: &str, report: &mut Report) {
     if let Some(t) = text.filter(|t| duration::seconds(t).is_none()) {
         report.push(Diagnostic::error(
             "bad-duration",

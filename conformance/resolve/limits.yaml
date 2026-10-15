@@ -1,0 +1,11 @@
+# MEP-0002: hard values take the smaller, and so do soft values, whichever block set them.
+madl: draft
+system: { id: limits, name: Limits }
+defaults:
+  restrictions:
+    budget: { tokens: { soft: 600000, hard: 1000000 }, turns: 50 }
+agents:
+  - id: a
+    settings:
+      restrictions:
+        budget: { tokens: { soft: 800000, hard: 900000 }, turns: { soft: 20, hard: 30 } }

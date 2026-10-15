@@ -117,10 +117,12 @@ fn egress(acc: &mut Option<Network>, new: &Egress, ctx: &mut Ctx) {
 
 fn budget(acc: &mut Budget, new: &Budget, ctx: &mut Ctx) {
     let f = "restrictions.budget";
-    min(&mut acc.tokens, &new.tokens, &format!("{f}.tokens"), ctx, |v| *v as f64);
+    min_limit(&mut acc.tokens, &new.tokens, &format!("{f}.tokens"), ctx, |v| *v as f64);
     min(&mut acc.cost_usd, &new.cost_usd, &format!("{f}.cost_usd"), ctx, |v| *v);
+    min_limit(&mut acc.turns, &new.turns, &format!("{f}.turns"), ctx, |v| *v as f64);
     let secs = |v: &String| duration::seconds(v).map_or(f64::INFINITY, |s| s as f64);
-    min(&mut acc.wall_clock, &new.wall_clock, &format!("{f}.wall_clock"), ctx, secs);
+    min_limit(&mut acc.wall_clock, &new.wall_clock, &format!("{f}.wall_clock"), ctx, secs);
+    min_limit(&mut acc.working_time, &new.working_time, &format!("{f}.working_time"), ctx, secs);
     let Some(scope) = new.scope else { return };
     if acc.scope == Some(BudgetScope::Shared) && scope == BudgetScope::Own {
         let why = "gives each agent its own budget, but an outer block shares one";
@@ -129,6 +131,29 @@ fn budget(acc: &mut Budget, new: &Budget, ctx: &mut Ctx) {
         acc.scope = Some(scope);
         ctx.source("restrictions.budget.scope");
     }
+}
+
+/// Like `min` on the hard values; the soft value kept is the smaller of the two blocks' soft values.
+fn min_limit<T: Clone>(
+    acc: &mut Option<Limit<T>>,
+    new: &Option<Limit<T>>,
+    field: &str,
+    ctx: &mut Ctx,
+    size: impl Fn(&T) -> f64,
+) {
+    let Some(n) = new else { return };
+    if acc.as_ref().is_some_and(|a| size(n.hard()) > size(a.hard())) {
+        return ctx.loosened(field, "is larger than an outer block's limit");
+    }
+    let soft = match (acc.as_ref().and_then(Limit::soft), n.soft()) {
+        (Some(a), Some(b)) => Some(if size(a) < size(b) { a.clone() } else { b.clone() }),
+        (a, b) => b.or(a).cloned(),
+    };
+    *acc = Some(match soft {
+        Some(s) => Limit::SoftHard(SoftHard { soft: Some(s), hard: n.hard().clone() }),
+        None => Limit::Hard(n.hard().clone()),
+    });
+    ctx.source(field);
 }
 
 /// Keep the smaller; report a larger value as loosening.
