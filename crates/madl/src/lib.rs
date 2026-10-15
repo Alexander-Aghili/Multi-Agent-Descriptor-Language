@@ -8,7 +8,7 @@
 //! # let _ = settings;
 //! ```
 pub mod diagnostic;
-mod duration;
+pub mod duration;
 pub mod expand;
 pub mod graph;
 pub mod load;
