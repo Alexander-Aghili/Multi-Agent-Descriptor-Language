@@ -61,6 +61,14 @@ pub struct Agent {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[ts(as = "Option<Vec<Output>>", optional)]
     pub outputs: Vec<Output>,
+    /// What the agent reads and writes, and what else it changes: its data contract.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub data_access: Option<DataAccess>,
+    /// The decisions this agent owns: within these domains the others defer to it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub authority: Option<Authority>,
     /// Commands run to check the agent's work.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[ts(as = "Option<Vec<Check>>", optional)]
@@ -174,6 +182,46 @@ pub struct Output {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub description: Option<String>,
+    /// Commands that decide whether this output is done: every one exits 0. A test, not a reviewer's
+    /// opinion, is the judge.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[ts(as = "Option<Vec<Check>>", optional)]
+    pub acceptance: Vec<Check>,
+}
+
+/// An agent's data contract: the paths it reads and writes (relative to the document; a trailing
+/// `/` or `/**` covers a folder), the effects it has beyond files, and why. A Runner SHOULD refuse a
+/// write outside `writes` where it can, and MUST say where it cannot. `restrictions.files` stays the
+/// hard limit; `data_access` declares what the agent is for.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema, TS)]
+#[serde(deny_unknown_fields)]
+#[ts(export)]
+pub struct DataAccess {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[ts(as = "Option<Vec<String>>", optional)]
+    pub reads: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[ts(as = "Option<Vec<String>>", optional)]
+    pub writes: Vec<String>,
+    /// Effects beyond its files, in plain words: "sends email", "pushes to main".
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    #[ts(as = "Option<Vec<String>>", optional)]
+    pub side_effects: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub rationale: Option<String>,
+}
+
+/// The decisions an agent owns, as domains in plain words ("wing geometry", "release dates").
+/// Runners SHOULD tell every agent who decides what, and send a question within a domain to its owner.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema, TS)]
+#[serde(deny_unknown_fields)]
+#[ts(export)]
+pub struct Authority {
+    pub domains: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub rationale: Option<String>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema, TS)]

@@ -52,6 +52,7 @@ communication:
 |---|---|
 | **Participants** | Agents on any runtime (Claude Code, Codex, CAMEL, CrewAI, LangGraph, OpenAI Agents, remote A2A agents), people, and steps such as checks, approvals, merges, fan-out and fan-in |
 | **Groups** | Named sets of agents with a shared purpose and shared settings; groups nest |
+| **Contracts** | What each agent reads, writes and otherwise changes (`data_access`), the decisions it owns (`authority`), and acceptance checks that decide when an output is done. Overlapping writes or decisions are flagged |
 | **Settings** | Global `defaults`, overridden per group and per agent. **Preferences** (model, runtime, protocol…) override; **restrictions** (tools, files, network, budgets, spawning, approvals, communication) only tighten. Each block says whether it reaches the agents an agent spawns |
 | **Communication** | Channels (direct chat, shared folder, shared memory, blackboard, bus, git, tracker, human) and connections with their kind, direction, protocol, initiator, sync mode, contents, round limit and condition; open or closed mode with bans |
 | **Topology** | An explicit graph, or patterns (pipeline, supervisor, committee, debate, role-play, auction, swarm, blackboard) that expand into one; loops are allowed when work can reach them |

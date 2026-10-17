@@ -132,7 +132,9 @@ to the group, the group's name and purpose.
 | `skills`, `context` | Skill paths or names; files given as context |
 | `workspace` | `folder`, and `copy`: `own` (its own git copy), `shared`, or `per-item` |
 | `placement` | `machine`: properties a machine must have, such as `os` or `name` |
-| `outputs` | `{ id, path, description }`: what the agent produces; connections `carry` them |
+| `outputs` | `{ id, path, description, acceptance }`: what the agent produces; connections `carry` them. `acceptance`: checks that must all pass for the output to count as done |
+| `data_access` | `{ reads, writes, side_effects, rationale }`: the agent's data contract (see below) |
+| `authority` | `{ domains, rationale }`: the decisions the agent owns (see below) |
 | `checks` | `{ command, after: each-turn \| finish, timeout_s }`: exit 0 means passed |
 | `settings`, `subagents` | See [Settings](settings.md) |
 | `extensions` | Vendor data |
@@ -140,6 +142,21 @@ to the group, the group's name and purpose.
 Runtimes are `claude-code`, `codex`, `camel`, `crewai`, `langgraph`, `openai-agents`, `autogen`,
 `remote-a2a`, `human`, or an extension name `x-<vendor>-<name>` (`unknown-runtime`). `human` makes
 a person a participant: people receive handoffs, answer `ask` connections and give approvals.
+
+### Data access and authority
+
+`data_access` declares what an agent is for: the paths it reads and writes, relative to the
+document (a trailing `/` or `/**` covers a folder), its effects beyond files in plain words, and why.
+A Runner SHOULD refuse a write outside `writes` where it can, and MUST tell the person where it
+cannot. `restrictions.files` stays the hard limit; the two combine by tightening.
+
+`authority` names the decisions an agent owns. A Runner SHOULD tell every agent who decides what,
+and send a question within a domain to its owner. Two agents that may write the same path, or own
+the same domain, get a warning (`write-overlap`, `authority-overlap`): either can be intended, but
+the author should know.
+
+An output's `acceptance` checks decide when it is done: every one exits 0. A Runner MUST NOT report
+an output as verified without running them.
 
 Environment values in an MCP server's `env` are either text or `{ secret: NAME }`; secret values
 MUST NOT be written into documents.

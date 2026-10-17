@@ -4,6 +4,10 @@
 
 The first public draft.
 
+- MEP 0003: agents may declare `data_access` (reads, writes, side effects, rationale) and `authority`
+  (the decisions they own); outputs take `acceptance` checks that decide when they are done. New
+  warnings `write-overlap` and `authority-overlap`. Ideas from Pact (github.com/wandercom/pact).
+
 - MEP 0002: limits take `{ soft, hard }` (wrap up, then stop); per-agent budgets gain `turns` and
   `working_time`; `system.budget` sets a budget for the whole run (plan-window shares, tokens, cost,
   wall clock, most agents working at once). New codes `budget-soft-above-hard`,

@@ -1,0 +1,5 @@
+madl: draft
+system: { id: s, name: S }
+agents:
+  - { id: lead, authority: { domains: [Release dates, scope] } }
+  - { id: pm, authority: { domains: [release dates] } }

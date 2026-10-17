@@ -1,0 +1,5 @@
+madl: draft
+system: { id: s, name: S }
+agents:
+  - { id: wings, data_access: { writes: [cad/wings/] } }
+  - { id: assembly, data_access: { writes: [cad/wings/spar.step, assembly/] } }

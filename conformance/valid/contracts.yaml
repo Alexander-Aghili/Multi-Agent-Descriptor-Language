@@ -1,0 +1,18 @@
+madl: draft
+system: { id: c172, name: C172 parts }
+agents:
+  - id: wings
+    instructions: Model the wing parts.
+    data_access:
+      reads: [manuals/, specs/wings.md]
+      writes: [cad/wings/]
+      side_effects: [none]
+      rationale: Only the wing team changes wing geometry.
+    authority: { domains: [wing geometry], rationale: It owns the wing model. }
+    outputs:
+      - id: wing-step
+        path: cad/wings/wing.step
+        acceptance: [ { command: python check_wing.py, timeout_s: 120 } ]
+  - id: assembly
+    data_access: { reads: [cad/], writes: [assembly/] }
+    authority: { domains: [part fit and tolerances] }

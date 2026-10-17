@@ -127,6 +127,17 @@
       "description": "One participant: a model-driven agent, a remote agent or a person.",
       "type": "object",
       "properties": {
+        "authority": {
+          "description": "The decisions this agent owns: within these domains the others defer to it.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Authority"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "checks": {
           "description": "Commands run to check the agent's work.",
           "type": "array",
@@ -140,6 +151,17 @@
           "items": {
             "type": "string"
           }
+        },
+        "data_access": {
+          "description": "What the agent reads and writes, and what else it changes: its data contract.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DataAccess"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "endpoint": {
           "description": "For `runtime: remote-a2a`: the agent's A2A endpoint or Agent Card URL.",
@@ -312,6 +334,28 @@
         }
       },
       "additionalProperties": false
+    },
+    "Authority": {
+      "description": "The decisions an agent owns, as domains in plain words (\"wing geometry\", \"release dates\").\nRunners SHOULD tell every agent who decides what, and send a question within a domain to its owner.",
+      "type": "object",
+      "properties": {
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rationale": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "domains"
+      ]
     },
     "Budget": {
       "type": "object",
@@ -714,6 +758,38 @@
           "const": "per-item"
         }
       ]
+    },
+    "DataAccess": {
+      "description": "An agent's data contract: the paths it reads and writes (relative to the document; a trailing\n`/` or `/**` covers a folder), the effects it has beyond files, and why. A Runner SHOULD refuse a\nwrite outside `writes` where it can, and MUST say where it cannot. `restrictions.files` stays the\nhard limit; `data_access` declares what the agent is for.",
+      "type": "object",
+      "properties": {
+        "rationale": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reads": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "side_effects": {
+          "description": "Effects beyond its files, in plain words: \"sends email\", \"pushes to main\".",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "writes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
     },
     "DenyRule": {
       "description": "A ban: `from` → `to` (one direction) or `between` (both). Ids may be agents or groups; `*`\nmatches anyone. `kinds` limits the ban to those kinds; empty bans every kind.",
@@ -1181,6 +1257,13 @@
     "Output": {
       "type": "object",
       "properties": {
+        "acceptance": {
+          "description": "Commands that decide whether this output is done: every one exits 0. A test, not a reviewer's\nopinion, is the judge.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Check"
+          }
+        },
         "description": {
           "type": [
             "string",

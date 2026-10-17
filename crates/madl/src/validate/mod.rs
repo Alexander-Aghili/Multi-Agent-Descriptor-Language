@@ -1,4 +1,5 @@
 //! `validate`: everything a Reader must check beyond the schema (spec §11).
+mod contracts;
 mod flow;
 mod index;
 mod limits;
@@ -22,6 +23,7 @@ pub fn validate(doc: &Document) -> Report {
         limits::run_budget(b, "/system/budget", &mut report);
     }
     shape::check(doc, &mut report);
+    contracts::check(doc, &mut report);
     if !report.is_ok() {
         return report;
     }

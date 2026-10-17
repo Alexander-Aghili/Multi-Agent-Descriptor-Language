@@ -41,6 +41,8 @@ fault, and a sentence. Tools and fixtures match on the code and pointer; the sen
 | `no-starting-point` | error | No agent starts the work |
 | `loop-without-start` | error | A loop no work can reach |
 | `unreachable` | warning | A step no work reaches |
+| `write-overlap` | warning | Two agents' `data_access.writes` cover the same path |
+| `authority-overlap` | warning | Two agents' `authority` names the same domain |
 
 ## Fixtures
 
