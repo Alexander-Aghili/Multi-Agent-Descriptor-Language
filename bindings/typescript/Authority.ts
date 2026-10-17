@@ -4,4 +4,9 @@
  * The decisions an agent owns, as domains in plain words ("wing geometry", "release dates").
  * Runners SHOULD tell every agent who decides what, and send a question within a domain to its owner.
  */
-export type Authority = { domains: Array<string>, rationale?: string, };
+export type Authority = { domains: Array<string>, 
+/**
+ * The group (or `system`) whose boundary this agent's decisions may cross: a decision belongs to
+ * the agent whose scope contains its consequences. Absent: decisions within the agent's own work.
+ */
+scope?: string, rationale?: string, };

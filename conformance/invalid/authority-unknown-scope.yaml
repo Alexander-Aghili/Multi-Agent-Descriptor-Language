@@ -1,0 +1,5 @@
+madl: draft
+system: { id: s, name: S }
+groups: [ { id: airframe } ]
+agents:
+  - { id: lead, authority: { domains: [interfaces], scope: propulsion } }

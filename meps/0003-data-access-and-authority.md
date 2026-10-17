@@ -45,7 +45,11 @@ agents:
   `writes` where it can, and MUST tell the person where it cannot (for example, writes made by a
   shell command). `restrictions.files` remains the hard limit, and the two combine by tightening.
 - **`authority`**: domains are plain words. A runner SHOULD tell every agent who decides what, and
-  route a question within a domain to its owner.
+  route a question within a domain to its owner. `scope` (a group id, or `system`) says how far the
+  agent's decisions reach. A decision belongs to the agent whose scope contains its consequences, so
+  a cross-boundary decision has an owner instead of being settled between two locally-right peers.
+  This follows McEntire's "The Swarm Needs a General": hierarchy by scope of responsibility, not by
+  relaying messages.
 - **`outputs[].acceptance`**: checks with the same shape as `checks`. The output is done when every
   one exits 0. A runner MUST NOT report an output as verified without running them.
 

@@ -1,6 +1,9 @@
 madl: draft
 system: { id: c172, name: C172 parts }
+groups: [ { id: airframe } ]
 agents:
+  - id: chief
+    authority: { domains: [interfaces between parts], scope: airframe, rationale: Its consequences cross the wing and fuselage teams. }
   - id: wings
     instructions: Model the wing parts.
     data_access:

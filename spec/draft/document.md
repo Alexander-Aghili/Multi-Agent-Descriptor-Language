@@ -151,7 +151,11 @@ A Runner SHOULD refuse a write outside `writes` where it can, and MUST tell the 
 cannot. `restrictions.files` stays the hard limit; the two combine by tightening.
 
 `authority` names the decisions an agent owns. A Runner SHOULD tell every agent who decides what,
-and send a question within a domain to its owner. Two agents that may write the same path, or own
+and send a question within a domain to its owner. Its `scope` (a group id, or `system`) says how far
+those decisions reach: a decision belongs to the agent whose scope contains its consequences.
+Specialists settle what stays inside their own work with each other directly; a decision whose
+consequences cross a group's boundary goes to the agent with that group as its scope. A Runner SHOULD
+tell agents so. Two agents that may write the same path, or own
 the same domain, get a warning (`write-overlap`, `authority-overlap`): either can be intended, but
 the author should know.
 

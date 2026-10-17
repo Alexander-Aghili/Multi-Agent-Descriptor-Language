@@ -350,6 +350,13 @@
             "string",
             "null"
           ]
+        },
+        "scope": {
+          "description": "The group (or `system`) whose boundary this agent's decisions may cross: a decision belongs to\nthe agent whose scope contains its consequences. Absent: decisions within the agent's own work.",
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "additionalProperties": false,

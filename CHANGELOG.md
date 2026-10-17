@@ -5,7 +5,7 @@
 The first public draft.
 
 - MEP 0003: agents may declare `data_access` (reads, writes, side effects, rationale) and `authority`
-  (the decisions they own); outputs take `acceptance` checks that decide when they are done. New
+  (the decisions they own, and with `scope` how far across groups they reach); outputs take `acceptance` checks that decide when they are done. New
   warnings `write-overlap` and `authority-overlap`. Ideas from Pact (github.com/wandercom/pact).
 
 - MEP 0002: limits take `{ soft, hard }` (wrap up, then stop); per-agent budgets gain `turns` and

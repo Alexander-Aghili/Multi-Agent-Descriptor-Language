@@ -17,7 +17,20 @@ fn overlaps(a: &str, b: &str) -> bool {
     a == b || a.is_empty() || b.is_empty() || b.starts_with(&format!("{a}/")) || a.starts_with(&format!("{b}/"))
 }
 
+/// An authority's `scope` names a group, or `system`.
+fn scopes(doc: &Document, report: &mut Report) {
+    for (i, agent) in doc.agents.iter().enumerate() {
+        if let Some(scope) = agent.authority.as_ref().and_then(|a| a.scope.as_deref())
+            && scope != "system"
+            && !doc.groups.iter().any(|g| g.id == scope)
+        {
+            report.push(Diagnostic::error("unknown-reference", format!("/agents/{i}/authority/scope"), format!("`{scope}` is not a group (or `system`)")));
+        }
+    }
+}
+
 pub fn check(doc: &Document, report: &mut Report) {
+    scopes(doc, report);
     for (i, agent) in doc.agents.iter().enumerate() {
         for earlier in doc.agents.iter().take(i) {
             if let (Some(mine), Some(theirs)) = (&agent.data_access, &earlier.data_access) {

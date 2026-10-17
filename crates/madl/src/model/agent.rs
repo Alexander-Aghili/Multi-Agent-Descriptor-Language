@@ -219,6 +219,11 @@ pub struct DataAccess {
 #[ts(export)]
 pub struct Authority {
     pub domains: Vec<String>,
+    /// The group (or `system`) whose boundary this agent's decisions may cross: a decision belongs to
+    /// the agent whose scope contains its consequences. Absent: decisions within the agent's own work.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[ts(optional)]
+    pub scope: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[ts(optional)]
     pub rationale: Option<String>,
